@@ -1,0 +1,33 @@
+{
+  "manifest_version": 3,
+  "name": "AutoSlay – Smart Form Filler",
+  "version": "1.0.0",
+  "description": "Automatically detect and fill forms across any website using your saved profile.",
+  "permissions": [
+    "activeTab",
+    "storage",
+    "scripting"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["http://localhost:5173/*"],
+      "js": ["bridge.js"],
+      "run_at": "document_start"
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "AutoSlay"
+  }
+}

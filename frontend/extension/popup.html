@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AutoSlay</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      width: 320px;
+      min-height: 200px;
+      background: #0f0e17;
+      color: #fff;
+      font-family: 'Segoe UI', sans-serif;
+      font-size: 13px;
+    }
+
+    .header {
+      padding: 16px 20px 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      font-size: 16px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #a78bfa, #f472b6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.3px;
+    }
+
+    .status-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: #22c55e;
+      box-shadow: 0 0 6px #22c55e;
+    }
+
+    .body { padding: 16px 20px; }
+
+    .user-card {
+      background: #1a1929;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 14px;
+    }
+
+    .user-name {
+      font-size: 15px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 2px;
+    }
+
+    .user-email {
+      font-size: 12px;
+      color: rgba(255,255,255,0.45);
+    }
+
+    .section-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: rgba(255,255,255,0.35);
+      margin-bottom: 6px;
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+
+    .pill {
+      padding: 4px 10px;
+      background: rgba(108, 71, 255, 0.18);
+      border: 1px solid rgba(108, 71, 255, 0.35);
+      border-radius: 50px;
+      font-size: 11px;
+      color: #c4b5fd;
+    }
+
+    .action-btn {
+      width: 100%;
+      padding: 11px;
+      border: none;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.15s;
+      margin-bottom: 8px;
+    }
+    .action-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+    .action-btn:active { transform: translateY(0); }
+
+    .btn-fill {
+      background: linear-gradient(135deg, #6C47FF, #FF4785);
+      color: #fff;
+    }
+
+    .btn-secondary {
+      background: rgba(255,255,255,0.07);
+      color: rgba(255,255,255,0.7);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .not-logged-in {
+      padding: 24px 20px;
+      text-align: center;
+    }
+
+    .not-logged-in p {
+      color: rgba(255,255,255,0.5);
+      margin-bottom: 16px;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .divider {
+      height: 1px;
+      background: rgba(255,255,255,0.07);
+      margin: 12px 0;
+    }
+
+    .footer {
+      padding: 10px 20px;
+      border-top: 1px solid rgba(255,255,255,0.07);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .footer-text {
+      font-size: 10px;
+      color: rgba(255,255,255,0.25);
+    }
+
+    .logout-btn {
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.3);
+      font-size: 11px;
+      cursor: pointer;
+      transition: color 0.15s;
+    }
+    .logout-btn:hover { color: #f87171; }
+
+    #toast {
+      display: none;
+      position: fixed;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1a1929;
+      border: 1px solid rgba(255,255,255,0.12);
+      color: #fff;
+      padding: 7px 14px;
+      border-radius: 8px;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo">⚡ AutoSlay</div>
+    <div class="status-dot" id="status-dot" style="background:#6b7280; box-shadow:none;"></div>
+  </div>
+
+  <div id="main-content">
+    <!-- filled by JS -->
+  </div>
+
+  <div id="toast"></div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
