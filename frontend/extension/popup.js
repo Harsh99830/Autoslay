@@ -59,13 +59,21 @@ function renderLoggedIn(user) {
   `;
 
   document.getElementById("fill-page-btn").onclick = () => {
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      chrome.scripting.executeScript({
-        target: { tabId: tabs[0].id },
-        func: triggerAutofill,
+    chrome.runtime.sendMessage({ type: "GET_USER_DATA" }, ({ user, token }) => {
+      if (!user || !token) {
+        showToast("Please log in first");
+        return;
+      }
+      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        chrome.tabs.sendMessage(tabs[0].id, { type: "FILL_FORM", user: user }, (response) => {
+          if (response && response.success) {
+            showToast(`Filled ${response.filled} fields!`);
+          } else {
+            showToast("Failed to fill form");
+          }
+          setTimeout(() => window.close(), 1200);
+        });
       });
-      showToast("Triggering autofill…");
-      setTimeout(() => window.close(), 1200);
     });
   };
 
@@ -79,12 +87,6 @@ function renderLoggedIn(user) {
       setTimeout(renderLoggedOut, 800);
     });
   };
-}
-
-function triggerAutofill() {
-  // This runs inside the page context — click the overlay button if present
-  const btn = document.getElementById("__autoslay_btn");
-  if (btn) btn.click();
 }
 
 function renderLoggedOut() {
