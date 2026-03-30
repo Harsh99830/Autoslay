@@ -6,15 +6,19 @@
 
   // ─── Constants ─────────────────────────────────────────────────────────────
   const FIELD_KEYWORDS = {
-    name:      ["name", "full.?name", "fullname", "your.?name"],
-    firstName: ["first.?name", "fname", "given.?name"],
-    lastName:  ["last.?name", "lname", "surname", "family.?name"],
-    email:     ["e.?mail", "email.?address"],
-    phone:     ["phone", "mobile", "tel", "contact.?number", "cell"],
-    address:   ["address", "street", "city", "location"],
-    linkedin:  ["linkedin"],
-    website:   ["website", "portfolio", "url"],
-    resume:    ["resume", "cv", "curriculum"],
+    name:      ["name", "full.?name", "fullname", "your.?name", "applicant.?name", "candidate.?name"],
+    firstName: ["first.?name", "fname", "given.?name", "firstname"],
+    lastName:  ["last.?name", "lname", "surname", "family.?name", "lastname"],
+    email:     ["e.?mail", "email.?address", "mail", "contact.?email"],
+    phone:     ["phone", "mobile", "tel", "contact.?number", "cell", "whatsapp", "contact"],
+    address:   ["address", "street", "city", "location", "residence", "current.?address"],
+    linkedin:  ["linkedin", "linked.?in", "profile"],
+    website:   ["website", "portfolio", "url", "personal.?site", "github"],
+    resume:    ["resume", "cv", "curriculum", "upload", "attachment"],
+    college:   ["college", "university", "institution", "school", "education"],
+    degree:    ["degree", "qualification", "major", "field.?of.?study"],
+    year:      ["year", "graduation", "passing.?year", "batch"],
+    experience:["experience", "work.?experience", "employment"],
   };
 
   // ─── Helpers ───────────────────────────────────────────────────────────────
@@ -246,7 +250,7 @@
       const fillData = {
         name:  user.name,
         firstName: (user.name || "").split(" ")[0],
-        lastName:  (user.name || "").split(" ").slice(1).join(" "),
+        lastName:  (user.name || "").split(" ").slice(1).join(" ") || (user.name || "").split(" ")[0],
         email: selectedEmail,
         phone: selectedPhone,
         linkedin: user.linkedin || "",
@@ -254,16 +258,40 @@
       };
 
       const fields = detectFormFields();
+      console.log("Detected fields:", fields.map(f => ({ type: f.type, name: f.el.name, id: f.el.id })));
+      
       let filled = 0;
+      const filledTypes = new Set();
+      
       fields.forEach(({ el, type }) => {
-        if (fillData[type] !== undefined) {
+        if (fillData[type] !== undefined && !filledTypes.has(type)) {
           fillField(el, fillData[type]);
           filled++;
+          filledTypes.add(type);
         }
       });
 
+      // Fallback: fill any empty text/email/tel inputs with name/email/phone if we haven't filled them yet
+      if (filled === 0) {
+        const allInputs = document.querySelectorAll("input[type='text'], input[type='email'], input[type='tel'], input:not([type]), textarea");
+        allInputs.forEach((el, index) => {
+          if (!el.value && index < 3) { // Only fill first 3 empty fields as fallback
+            if (index === 0 && user.name) {
+              fillField(el, user.name);
+              filled++;
+            } else if (index === 1 && selectedEmail) {
+              fillField(el, selectedEmail);
+              filled++;
+            } else if (index === 2 && selectedPhone) {
+              fillField(el, selectedPhone);
+              filled++;
+            }
+          }
+        });
+      }
+
       showToast(`✅ Filled ${filled} field${filled !== 1 ? "s" : ""}!`);
-      overlay.remove();
+      setTimeout(() => overlay.remove(), 1000);
     };
   }
 
