@@ -102,33 +102,62 @@ app.get('/user', authMiddleware, async (req, res) => {
 // Update user profile
 app.post('/user/update', authMiddleware, async (req, res) => {
   const { name, emails, phone_numbers, linkedin, website } = req.body;
+  const userId = req.user.id;
 
   try {
-    const { data, error } = await supabase
+    // Use service role client - it bypasses RLS
+    // But we need to handle the case where profile doesn't exist yet
+    const { data: existingProfile } = await supabase
       .from('profiles')
-      .upsert({
-        id: req.user.id,
-        name,
-        emails,
-        phone_numbers,
-        linkedin,
-        website,
-        updated_at: new Date().toISOString()
-      }, { onConflict: 'id' })
-      .select()
+      .select('id')
+      .eq('id', userId)
       .single();
 
-    if (error) throw error;
+    let result;
+    if (existingProfile) {
+      // Update existing profile
+      result = await supabase
+        .from('profiles')
+        .update({
+          name,
+          emails,
+          phone_numbers,
+          linkedin,
+          website,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', userId)
+        .select()
+        .single();
+    } else {
+      // Insert new profile
+      result = await supabase
+        .from('profiles')
+        .insert({
+          id: userId,
+          name,
+          emails,
+          phone_numbers,
+          linkedin,
+          website,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        })
+        .select()
+        .single();
+    }
+
+    if (result.error) throw result.error;
 
     const userData = {
-      id: req.user.id,
+      id: userId,
       email: req.user.email,
-      name: data?.name || name || '',
-      emails: data?.emails || emails || [],
-      phone_numbers: data?.phone_numbers || phone_numbers || [],
-      resumes: data?.resumes || [],
-      linkedin: data?.linkedin || linkedin || '',
-      website: data?.website || website || '',
+      name: result.data?.name || name || '',
+      emails: result.data?.emails || emails || [],
+      phone_numbers: result.data?.phone_numbers || phone_numbers || [],
+      resumes: result.data?.resumes || [],
+      linkedin: result.data?.linkedin || linkedin || '',
+      website: result.data?.website || website || '',
     };
 
     res.json(userData);
@@ -144,32 +173,43 @@ app.post('/upload-resume', authMiddleware, upload.single('resume'), async (req, 
     return res.status(400).json({ error: 'No file uploaded' });
   }
 
+  const userId = req.user.id;
+
   try {
-    // Get current resumes
-    const { data: profile, error: fetchError } = await supabase
+    // Get current profile
+    const { data: existingProfile } = await supabase
       .from('profiles')
-      .select('resumes')
-      .eq('id', req.user.id)
+      .select('id, resumes')
+      .eq('id', userId)
       .single();
 
-    if (fetchError && fetchError.code !== 'PGRST116') {
-      throw fetchError;
-    }
-
     const fileUrl = `/uploads/${req.file.filename}`;
-    const currentResumes = profile?.resumes || [];
+    const currentResumes = existingProfile?.resumes || [];
     const updatedResumes = [...currentResumes, fileUrl];
 
-    // Update profile with new resume
-    const { error: updateError } = await supabase
-      .from('profiles')
-      .upsert({
-        id: req.user.id,
-        resumes: updatedResumes,
-        updated_at: new Date().toISOString()
-      }, { onConflict: 'id' });
+    let result;
+    if (existingProfile) {
+      // Update existing profile
+      result = await supabase
+        .from('profiles')
+        .update({
+          resumes: updatedResumes,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', userId);
+    } else {
+      // Insert new profile
+      result = await supabase
+        .from('profiles')
+        .insert({
+          id: userId,
+          resumes: updatedResumes,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        });
+    }
 
-    if (updateError) throw updateError;
+    if (result.error) throw result.error;
 
     res.json({ url: fileUrl, message: 'Resume uploaded successfully' });
   } catch (err) {

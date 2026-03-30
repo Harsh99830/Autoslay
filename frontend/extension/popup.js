@@ -67,11 +67,17 @@ function renderLoggedIn(user) {
       chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
         chrome.tabs.sendMessage(tabs[0].id, { type: "FILL_FORM", user: user }, (response) => {
           if (response && response.success) {
-            showToast(`Filled ${response.filled} fields!`);
+            if (response.showingSelector) {
+              // Selection panel shown on page, close popup
+              window.close();
+            } else {
+              showToast(`Filled ${response.filled} fields!`);
+              setTimeout(() => window.close(), 1200);
+            }
           } else {
             showToast("Failed to fill form");
+            setTimeout(() => window.close(), 1200);
           }
-          setTimeout(() => window.close(), 1200);
         });
       });
     });

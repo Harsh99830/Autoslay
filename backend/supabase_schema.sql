@@ -20,12 +20,25 @@ CREATE TABLE IF NOT EXISTS public.profiles (
 -- Enable RLS
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 
--- Create policy: users can only access their own profile
+-- Drop existing policies if any
+DROP POLICY IF EXISTS "Users can only access their own profile" ON public.profiles;
+DROP POLICY IF EXISTS "Service role can access all profiles" ON public.profiles;
+
+-- Create policy: users can only access their own profile (for client-side access)
 CREATE POLICY "Users can only access their own profile"
     ON public.profiles
     FOR ALL
+    TO authenticated
     USING (auth.uid() = id)
     WITH CHECK (auth.uid() = id);
+
+-- Create policy: service role can access all profiles (for server-side access)
+CREATE POLICY "Service role can access all profiles"
+    ON public.profiles
+    FOR ALL
+    TO service_role
+    USING (true)
+    WITH CHECK (true);
 
 -- Function to create profile on user signup
 CREATE OR REPLACE FUNCTION public.handle_new_user()
