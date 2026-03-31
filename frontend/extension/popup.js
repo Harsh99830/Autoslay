@@ -1,6 +1,7 @@
 // popup.js — AutoSlay Extension Popup
+// FRONTEND_URL is defined in config.js (loaded before this script)
 
-const DASHBOARD_URL = "https://autoslay.vercel.app"; // Your React app URL
+const DASHBOARD_URL = CONFIG.FRONTEND_URL + '/dashboard';
 
 const mainContent = document.getElementById("main-content");
 const statusDot   = document.getElementById("status-dot");

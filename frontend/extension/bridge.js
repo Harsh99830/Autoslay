@@ -1,11 +1,11 @@
 // bridge.js — Content script that bridges web app ↔ extension communication
-// This runs in the context of localhost:5173 when the user is logged in
+// This runs in the context of the frontend URL when the user is logged in
 
 (function() {
   // Listen for messages from the web app (AuthContext)
   window.addEventListener('message', (event) => {
-    // Only accept messages from the same origin (localhost:5173)
-    if (event.origin !== 'https://autoslay.vercel.app' && event.origin !== window.location.origin) {
+    // Only accept messages from the configured frontend URL or same origin
+    if (event.origin !== CONFIG.FRONTEND_URL && event.origin !== window.location.origin) {
       return;
     }
 
