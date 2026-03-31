@@ -56,6 +56,32 @@
   box-shadow: 0 0 6px #22c55e;
 }
 
+/* ─── Search bar ──────────────────────────────────────────────────── */
+.dash-search-bar {
+  margin-bottom: 24px;
+}
+
+.dash-search-input {
+  width: 100%;
+  padding: 12px 16px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-size: 14px;
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+
+.dash-search-input:focus {
+  outline: none;
+  border-color: var(--purple);
+}
+
+.dash-search-input::placeholder {
+  color: var(--muted);
+}
+
 /* ─── Grid ─────────────────────────────────────────────────────────── */
 .dash-grid {
   display: grid;

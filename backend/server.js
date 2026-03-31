@@ -90,6 +90,10 @@ app.get('/user', authMiddleware, async (req, res) => {
       resumes: profile?.resumes || [],
       linkedin: profile?.linkedin || '',
       website: profile?.website || '',
+      github: profile?.github || '',
+      address: profile?.address || '',
+      college: profile?.college || '',
+      degree: profile?.degree || '',
     };
 
     res.json(userData);
@@ -101,7 +105,7 @@ app.get('/user', authMiddleware, async (req, res) => {
 
 // Update user profile
 app.post('/user/update', authMiddleware, async (req, res) => {
-  const { name, emails, phone_numbers, linkedin, website } = req.body;
+  const { name, emails, phone_numbers, linkedin, website, github, address, college, degree } = req.body;
   const userId = req.user.id;
 
   try {
@@ -124,6 +128,10 @@ app.post('/user/update', authMiddleware, async (req, res) => {
           phone_numbers,
           linkedin,
           website,
+          github,
+          address,
+          college,
+          degree,
           updated_at: new Date().toISOString()
         })
         .eq('id', userId)
@@ -140,6 +148,10 @@ app.post('/user/update', authMiddleware, async (req, res) => {
           phone_numbers,
           linkedin,
           website,
+          github,
+          address,
+          college,
+          degree,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
         })
@@ -158,6 +170,10 @@ app.post('/user/update', authMiddleware, async (req, res) => {
       resumes: result.data?.resumes || [],
       linkedin: result.data?.linkedin || linkedin || '',
       website: result.data?.website || website || '',
+      github: result.data?.github || github || '',
+      address: result.data?.address || address || '',
+      college: result.data?.college || college || '',
+      degree: result.data?.degree || degree || '',
     };
 
     res.json(userData);
