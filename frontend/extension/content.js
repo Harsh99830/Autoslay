@@ -155,7 +155,7 @@
     const fieldsHtml = fillableFields.map((field, index) => {
       const fieldId = `__autoslay_field_${index}`;
       const valueDisplay = field.isSelectable 
-        ? `<select id="${fieldId}_select" style="flex:1; padding:8px 10px; background:#1a1929; border:1px solid rgba(255,255,255,0.15); border-radius:6px; color:#fff; font-size:13px; margin-left:10px;">
+        ? `<select id="${fieldId}_select" style="flex:1; min-width:0; max-width:calc(100% - 120px); padding:8px 10px; background:#1a1929; border:1px solid rgba(255,255,255,0.15); border-radius:6px; color:#fff; font-size:13px; margin-left:10px; box-sizing:border-box;">
             ${field.options.map(opt => `<option value="${opt}">${opt}</option>`).join('')}
            </select>`
         : `<span style="flex:1; margin-left:10px; font-size:13px; color:rgba(255,255,255,0.8); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${field.value}</span>`;
