@@ -6,11 +6,11 @@
 
   // ─── Constants ─────────────────────────────────────────────────────────────
   const FIELD_KEYWORDS = {
-    name:      ["name", "full.?name", "fullname", "your.?name", "applicant.?name", "candidate.?name"],
+    name:      ["name", "full.?name", "fullname", "your.?name", "applicant.?name", "candidate.?name", "full name"],
     firstName: ["first.?name", "fname", "given.?name", "firstname"],
     lastName:  ["last.?name", "lname", "surname", "family.?name", "lastname"],
-    email:     ["e.?mail", "email.?address", "mail", "contact.?email"],
-    phone:     ["phone", "mobile", "tel", "contact.?number", "cell", "whatsapp", "contact"],
+    email:     ["e.?mail", "email.?address", "mail", "contact.?email", "email id"],
+    phone:     ["phone", "mobile", "tel", "contact.?number", "cell", "whatsapp", "contact", "mobile number"],
     address:   ["address", "street", "city", "location", "residence", "current.?address"],
     linkedin:  ["linkedin", "linked.?in", "profile"],
     website:   ["website", "portfolio", "url", "personal.?site", "github"],
@@ -29,16 +29,40 @@
   }
 
   function classifyField(el) {
+    // Get text content from nearby elements (for Google Forms style)
+    const getNearbyText = () => {
+      // Check parent containers for labels
+      let parent = el.parentElement;
+      for (let i = 0; i < 3 && parent; i++) {
+        const text = parent.innerText || parent.textContent || '';
+        if (text) return text.substring(0, 200);
+        parent = parent.parentElement;
+      }
+      return '';
+    };
+
     const attrs = [
       el.getAttribute("name") || "",
       el.getAttribute("id") || "",
       el.getAttribute("placeholder") || "",
       el.getAttribute("aria-label") || "",
+      el.getAttribute("data-initial-value") || "",
+      el.getAttribute("data-field-label") || "",
+      el.getAttribute("title") || "",
+      getNearbyText(),
     ];
+    
+    // Check for label with 'for' attribute
     const labelEl = el.id
       ? document.querySelector(`label[for="${el.id}"]`)
       : null;
     if (labelEl) attrs.push(labelEl.innerText || "");
+    
+    // Check preceding sibling or parent label (common in Google Forms)
+    const prevLabel = el.previousElementSibling;
+    if (prevLabel && (prevLabel.tagName === 'LABEL' || prevLabel.tagName === 'DIV')) {
+      attrs.push(prevLabel.innerText || prevLabel.textContent || '');
+    }
 
     const combined = attrs.join(" ");
     for (const [type, keys] of Object.entries(FIELD_KEYWORDS)) {
@@ -51,14 +75,31 @@
   }
 
   function detectFormFields() {
+    // Standard inputs + contenteditable divs (Google Forms style)
     const inputs = document.querySelectorAll(
-      "input:not([type='hidden']):not([type='submit']):not([type='button']):not([type='checkbox']):not([type='radio']), textarea"
+      "input:not([type='hidden']):not([type='submit']):not([type='button']):not([type='checkbox']):not([type='radio']):not([type='file']), textarea, [contenteditable='true'], [role='textbox']"
     );
     const fields = [];
     inputs.forEach(el => {
       const type = classifyField(el);
       if (type) fields.push({ el, type });
     });
+    
+    // If no fields found with standard detection, try aggressive fallback
+    if (fields.length === 0) {
+      const allInputs = document.querySelectorAll("input[type='text'], input:not([type]), textarea, [contenteditable='true']");
+      allInputs.forEach((el, index) => {
+        // Try to infer type from position or generic labeling
+        const text = (el.placeholder || el.ariaLabel || el.title || '').toLowerCase();
+        if (text.includes('name')) fields.push({ el, type: 'name' });
+        else if (text.includes('email')) fields.push({ el, type: 'email' });
+        else if (text.includes('phone') || text.includes('mobile') || text.includes('tel')) fields.push({ el, type: 'phone' });
+        else if (index === 0) fields.push({ el, type: 'name' }); // First field often name
+        else if (index === 1) fields.push({ el, type: 'email' }); // Second often email
+        else if (index === 2) fields.push({ el, type: 'phone' }); // Third often phone
+      });
+    }
+    
     return fields;
   }
 
