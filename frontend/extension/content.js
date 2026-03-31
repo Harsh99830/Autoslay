@@ -107,15 +107,21 @@
     const emails = user.emails || [];
     const phones = user.phone_numbers || [];
 
-    // Build list of all fillable fields
+    // Get detected field types (what's actually on the page)
+    const detectedTypes = new Set();
+    if (detectedFields && detectedFields.length > 0) {
+      detectedFields.forEach(f => detectedTypes.add(f.type));
+    }
+
+    // Build list of fillable fields that match detected types
     const fillableFields = [];
     
-    if (user.name) {
+    if (user.name && detectedTypes.has('name')) {
       fillableFields.push({ type: 'name', label: 'Name', value: user.name });
     }
     
-    // Email selector (if multiple)
-    if (emails.length > 0) {
+    // Email selector (if multiple) - only if email detected on page
+    if (emails.length > 0 && detectedTypes.has('email')) {
       if (emails.length === 1) {
         fillableFields.push({ type: 'email', label: 'Email', value: emails[0] });
       } else {
@@ -123,8 +129,8 @@
       }
     }
     
-    // Phone selector (if multiple)
-    if (phones.length > 0) {
+    // Phone selector (if multiple) - only if phone detected on page
+    if (phones.length > 0 && detectedTypes.has('phone')) {
       if (phones.length === 1) {
         fillableFields.push({ type: 'phone', label: 'Phone', value: phones[0] });
       } else {
@@ -132,23 +138,52 @@
       }
     }
     
-    if (user.linkedin) {
+    if (user.linkedin && detectedTypes.has('linkedin')) {
       fillableFields.push({ type: 'linkedin', label: 'LinkedIn', value: user.linkedin });
     }
-    if (user.website) {
+    if (user.website && detectedTypes.has('website')) {
       fillableFields.push({ type: 'website', label: 'Website', value: user.website });
     }
-    if (user.github) {
+    if (user.github && detectedTypes.has('github')) {
       fillableFields.push({ type: 'github', label: 'GitHub', value: user.github });
     }
-    if (user.address) {
+    if (user.address && detectedTypes.has('address')) {
       fillableFields.push({ type: 'address', label: 'Address', value: user.address });
     }
-    if (user.college) {
+    if (user.college && detectedTypes.has('college')) {
       fillableFields.push({ type: 'college', label: 'College/University', value: user.college });
     }
-    if (user.degree) {
+    if (user.degree && detectedTypes.has('degree')) {
       fillableFields.push({ type: 'degree', label: 'Degree', value: user.degree });
+    }
+
+    // Show message if no matching fields found
+    if (fillableFields.length === 0) {
+      panel.innerHTML = `
+        <div style="font-size:18px; font-weight:700; margin-bottom:8px; text-align:center;">
+          ⚡ No Matching Fields
+        </div>
+        <div style="font-size:12px; color:rgba(255,255,255,0.5); margin-bottom:20px; text-align:center;">
+          No form fields on this page match your profile data.
+        </div>
+        <div style="display:flex; gap:12px;">
+          <button id="__autoslay_cancel" style="flex:1; padding:12px; background:rgba(255,255,255,0.1); border:none; border-radius:10px; color:#fff; font-size:14px; cursor:pointer;">Close</button>
+        </div>
+      `;
+      
+      const backdrop = document.createElement("div");
+      backdrop.id = "__autoslay_backdrop";
+      backdrop.style.cssText = `
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0,0,0,0.5);
+        z-index: 2147483646;
+      `;
+      backdrop.onclick = () => { panel.remove(); backdrop.remove(); };
+      document.body.appendChild(backdrop);
+      document.body.appendChild(panel);
+      document.getElementById("__autoslay_cancel").onclick = () => { panel.remove(); backdrop.remove(); };
+      return;
     }
 
     // Build field items HTML
@@ -316,8 +351,12 @@
     if (message.type === "FILL_FORM") {
       const user = message.user;
       
-      // Always show selection panel so user can confirm what to fill
-      showSelectionPanel(user, null, (selectedFields) => {
+      // Detect fields on the page first
+      const detectedFields = detectFormFields();
+      console.log("Detected fields:", detectedFields.map(f => f.type));
+      
+      // Show selection panel with only detected fields
+      showSelectionPanel(user, detectedFields, (selectedFields) => {
         const filled = fillFormWithUserData(user, selectedFields);
         showToast(`✅ Filled ${filled} field${filled !== 1 ? "s" : ""}!`);
       });
