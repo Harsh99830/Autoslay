@@ -108,6 +108,8 @@ app.post('/user/update', authMiddleware, async (req, res) => {
   const { name, emails, phone_numbers, linkedin, website, github, address, college, degree } = req.body;
   const userId = req.user.id;
 
+  console.log('Update request body:', req.body);
+
   try {
     // Use service role client - it bypasses RLS
     // But we need to handle the case where profile doesn't exist yet
@@ -116,6 +118,8 @@ app.post('/user/update', authMiddleware, async (req, res) => {
       .select('id')
       .eq('id', userId)
       .single();
+
+    console.log('Existing profile:', existingProfile);
 
     let result;
     if (existingProfile) {
@@ -158,6 +162,8 @@ app.post('/user/update', authMiddleware, async (req, res) => {
         .select()
         .single();
     }
+
+    console.log('Supabase result:', result);
 
     if (result.error) throw result.error;
 
