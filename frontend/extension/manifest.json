@@ -21,7 +21,7 @@
       "run_at": "document_idle"
     },
     {
-      "matches": ["http://localhost:5173/*"],
+      "matches": ["https://autoslay.vercel.app/*"],
       "js": ["bridge.js"],
       "run_at": "document_start"
     }

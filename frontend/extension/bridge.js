@@ -5,7 +5,7 @@
   // Listen for messages from the web app (AuthContext)
   window.addEventListener('message', (event) => {
     // Only accept messages from the same origin (localhost:5173)
-    if (event.origin !== 'http://localhost:5173' && event.origin !== window.location.origin) {
+    if (event.origin !== 'https://autoslay.vercel.app' && event.origin !== window.location.origin) {
       return;
     }
 

@@ -1,6 +1,6 @@
 // popup.js — AutoSlay Extension Popup
 
-const DASHBOARD_URL = "http://localhost:5173"; // Your React app URL
+const DASHBOARD_URL = "https://autoslay.vercel.app"; // Your React app URL
 
 const mainContent = document.getElementById("main-content");
 const statusDot   = document.getElementById("status-dot");
