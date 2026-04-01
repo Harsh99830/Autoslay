@@ -6,18 +6,18 @@
 
   // ─── Constants ─────────────────────────────────────────────────────────────
   const FIELD_KEYWORDS = {
-    name:      ["name", "full.?name", "fullname", "your.?name", "applicant.?name", "candidate.?name", "full name"],
+    name:      ["\\bname\\b", "full.?name", "fullname", "your.?name", "applicant.?name", "candidate.?name", "full name"],
     firstName: ["first.?name", "fname", "given.?name", "firstname"],
     lastName:  ["last.?name", "lname", "surname", "family.?name", "lastname"],
-    email:     ["e.?mail", "email.?address", "mail", "contact.?email", "email id"],
-    phone:     ["phone", "mobile", "tel", "contact.?number", "cell", "whatsapp", "contact", "mobile number"],
-    address:   ["address", "street", "city", "location", "residence", "current.?address"],
-    linkedin:  ["linkedin", "linked.?in", "profile"],
-    website:   ["website", "portfolio", "url", "personal.?site", "github"],
-    resume:    ["resume", "cv", "curriculum", "upload", "attachment"],
-    college:   ["college", "university", "institution", "school", "education"],
-    degree:    ["degree", "qualification", "major", "field.?of.?study"],
-    year:      ["year", "graduation", "passing.?year", "batch"],
+    email:     ["\\bemail\\b", "e.?mail", "email.?address", "\\bmail\\b", "contact.?email", "email id"],
+    phone:     ["\\bphone\\b", "\\bmobile\\b", "\\btel\\b", "contact.?number", "\\bcell\\b", "whatsapp", "\\bcontact\\b", "mobile number"],
+    address:   ["\\baddress\\b", "street", "city", "location", "residence", "current.?address"],
+    linkedin:  ["linkedin", "linked.?in", "\\bprofile\\b"],
+    website:   ["\\bwebsite\\b", "portfolio", "\\burl\\b", "personal.?site", "github"],
+    resume:    ["\\bresume\\b", "\\bcv\\b", "curriculum", "upload", "attachment"],
+    college:   ["\\bcollege\\b", "university", "institution", "school", "education"],
+    degree:    ["\\bdegree\\b", "qualification", "major", "field.?of.?study"],
+    year:      ["\\byear\\b", "graduation", "passing.?year", "batch"],
     experience:["experience", "work.?experience", "employment"],
   };
 
@@ -29,19 +29,13 @@
   }
 
   function classifyField(el) {
-    // Get text content from nearby elements (for Google Forms style)
-    const getNearbyText = () => {
-      // Check parent containers for labels
-      let parent = el.parentElement;
-      for (let i = 0; i < 3 && parent; i++) {
-        const text = parent.innerText || parent.textContent || '';
-        if (text) return text.substring(0, 200);
-        parent = parent.parentElement;
-      }
-      return '';
-    };
-
-    const attrs = [
+    // First check: input type attributes (highest priority)
+    if (el.type === "email") return "email";
+    if (el.type === "tel") return "phone";
+    if (el.type === "file") return "resume";
+    
+    // Second check: element's own attributes
+    const ownAttrs = [
       el.getAttribute("name") || "",
       el.getAttribute("id") || "",
       el.getAttribute("placeholder") || "",
@@ -49,28 +43,58 @@
       el.getAttribute("data-initial-value") || "",
       el.getAttribute("data-field-label") || "",
       el.getAttribute("title") || "",
-      getNearbyText(),
     ];
     
-    // Check for label with 'for' attribute
+    const ownCombined = ownAttrs.join(" ");
+    console.log('Checking attributes:', JSON.stringify(ownCombined));
+    
+    // Check EMAIL first (before name) to avoid matching "name" in "name@example.com"
+    if (matchesKeywords(ownCombined, FIELD_KEYWORDS.email)) {
+      console.log('Matched email');
+      return 'email';
+    }
+    
+    // Then check other fields
+    for (const [type, keys] of Object.entries(FIELD_KEYWORDS)) {
+      if (type === 'email') continue; // Already checked above
+      if (matchesKeywords(ownCombined, keys)) {
+        console.log(`Matched ${type} with keywords:`, keys);
+        return type;
+      }
+    }
+    
+    // Third check: label with 'for' attribute
     const labelEl = el.id
       ? document.querySelector(`label[for="${el.id}"]`)
       : null;
-    if (labelEl) attrs.push(labelEl.innerText || "");
+    if (labelEl) {
+      const labelText = labelEl.innerText || "";
+      for (const [type, keys] of Object.entries(FIELD_KEYWORDS)) {
+        if (matchesKeywords(labelText, keys)) return type;
+      }
+    }
     
-    // Check preceding sibling or parent label (common in Google Forms)
+    // Fourth check: preceding sibling
     const prevLabel = el.previousElementSibling;
     if (prevLabel && (prevLabel.tagName === 'LABEL' || prevLabel.tagName === 'DIV')) {
-      attrs.push(prevLabel.innerText || prevLabel.textContent || '');
+      const prevText = prevLabel.innerText || prevLabel.textContent || '';
+      for (const [type, keys] of Object.entries(FIELD_KEYWORDS)) {
+        if (matchesKeywords(prevText, keys)) return type;
+      }
+    }
+    
+    // Last: parent containers (lower priority to avoid false positives)
+    let parent = el.parentElement;
+    for (let i = 0; i < 2 && parent; i++) {
+      const text = parent.innerText || parent.textContent || '';
+      // For parent text, be more specific - check for exact keywords
+      const lowerText = text.toLowerCase();
+      if (lowerText.includes('email address') || lowerText.includes('email id')) return 'email';
+      if (lowerText.includes('full name') || lowerText.includes('your name')) return 'name';
+      if (lowerText.includes('mobile number') || lowerText.includes('phone number')) return 'phone';
+      parent = parent.parentElement;
     }
 
-    const combined = attrs.join(" ");
-    for (const [type, keys] of Object.entries(FIELD_KEYWORDS)) {
-      if (matchesKeywords(combined, keys)) return type;
-    }
-    if (el.type === "email") return "email";
-    if (el.type === "tel") return "phone";
-    if (el.type === "file") return "resume";
     return null;
   }
 
@@ -80,19 +104,34 @@
       "input:not([type='hidden']):not([type='submit']):not([type='button']):not([type='checkbox']):not([type='radio']):not([type='file']), textarea, [contenteditable='true'], [role='textbox']"
     );
     const fields = [];
-    inputs.forEach(el => {
+    
+    console.log('=== AutoSlay Field Detection ===');
+    console.log('Found', inputs.length, 'input elements');
+    
+    inputs.forEach((el, idx) => {
       const type = classifyField(el);
+      const fieldDesc = type ? `${type.toUpperCase()} box` : 'unknown field';
+      console.log(`  [${idx}] ${fieldDesc}:`, { 
+        tag: el.tagName,
+        type: el.type, 
+        name: el.name, 
+        id: el.id, 
+        placeholder: el.placeholder?.substring(0, 30)
+      });
       if (type) fields.push({ el, type });
     });
     
+    console.log('Total detected:', fields.length, 'fields →', fields.map(f => f.type.toUpperCase()).join(', '));
+    console.log('================================');
+    
     // If no fields found with standard detection, try aggressive fallback
     if (fields.length === 0) {
-      const allInputs = document.querySelectorAll("input[type='text'], input:not([type]), textarea, [contenteditable='true']");
+      const allInputs = document.querySelectorAll("input[type='text'], input[type='email'], input:not([type]), textarea, [contenteditable='true']");
       allInputs.forEach((el, index) => {
         // Try to infer type from position or generic labeling
-        const text = (el.placeholder || el.ariaLabel || el.title || '').toLowerCase();
-        if (text.includes('name')) fields.push({ el, type: 'name' });
-        else if (text.includes('email')) fields.push({ el, type: 'email' });
+        const text = (el.placeholder || el.ariaLabel || el.title || el.name || el.id || '').toLowerCase();
+        if (text.includes('email') || el.type === 'email') fields.push({ el, type: 'email' });
+        else if (text.includes('name')) fields.push({ el, type: 'name' });
         else if (text.includes('phone') || text.includes('mobile') || text.includes('tel')) fields.push({ el, type: 'phone' });
         else if (index === 0) fields.push({ el, type: 'name' }); // First field often name
         else if (index === 1) fields.push({ el, type: 'email' }); // Second often email
