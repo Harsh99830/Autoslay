@@ -3,6 +3,7 @@ import { AuthProvider, useAuth } from "./context/AuthContext";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import AuthCallback from "./pages/AuthCallback";
+import PrivacyPolicy from "./pages/Legal";
 import "./styles/global.css";
 
 function ProtectedRoute({ children }) {
@@ -28,6 +29,7 @@ function AppRoutes() {
     <Routes>
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
       <Route path="/auth/callback" element={<AuthCallback />} />
+      <Route path="/legal" element={<PrivacyPolicy />} />
       <Route
         path="/login"
         element={<PublicRoute><Login /></PublicRoute>}

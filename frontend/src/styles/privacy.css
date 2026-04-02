@@ -1,0 +1,135 @@
+/* Privacy Policy Page Styles */
+.privacy-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  color: #f8fafc;
+  padding: 2rem 1rem;
+}
+
+.privacy-container {
+  max-width: 800px;
+  margin: 0 auto;
+  background: rgba(30, 41, 59, 0.8);
+  backdrop-filter: blur(12px);
+  border-radius: 20px;
+  border: 1px solid rgba(148, 163, 184, 0.1);
+  padding: 3rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+.privacy-header {
+  text-align: center;
+  margin-bottom: 3rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.privacy-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.privacy-logo {
+  font-size: 2rem;
+  filter: drop-shadow(0 0 10px rgba(99, 102, 241, 0.5));
+}
+
+.privacy-brand h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #d946ef 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.privacy-header h2 {
+  font-size: 2rem;
+  font-weight: 600;
+  color: #f8fafc;
+  margin-top: 0.5rem;
+}
+
+.privacy-content {
+  line-height: 1.8;
+}
+
+.privacy-intro {
+  font-size: 1.1rem;
+  color: #94a3b8;
+  margin-bottom: 2rem;
+  font-style: italic;
+}
+
+.privacy-section {
+  margin-bottom: 2rem;
+  padding-left: 1rem;
+  border-left: 3px solid #6366f1;
+}
+
+.privacy-section h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #6366f1;
+  margin-bottom: 0.75rem;
+  margin-left: -1rem;
+  padding-left: 1rem;
+}
+
+.privacy-section p {
+  color: #cbd5e1;
+  margin-bottom: 0.75rem;
+}
+
+.privacy-section ul {
+  list-style: disc;
+  padding-left: 1.5rem;
+  color: #cbd5e1;
+}
+
+.privacy-section li {
+  margin-bottom: 0.5rem;
+}
+
+.privacy-section a {
+  color: #818cf8;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.privacy-section a:hover {
+  color: #a5b4fc;
+  text-decoration: underline;
+}
+
+.privacy-footer {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(148, 163, 184, 0.2);
+  text-align: center;
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .privacy-container {
+    padding: 2rem 1.5rem;
+  }
+
+  .privacy-header h2 {
+    font-size: 1.5rem;
+  }
+
+  .privacy-section {
+    padding-left: 0.75rem;
+  }
+
+  .privacy-section h3 {
+    font-size: 1.1rem;
+  }
+}
