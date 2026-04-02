@@ -1,7 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import Login from "./pages/Login";
-import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
 import AuthCallback from "./pages/AuthCallback";
 import "./styles/global.css";
@@ -33,10 +32,7 @@ function AppRoutes() {
         path="/login"
         element={<PublicRoute><Login /></PublicRoute>}
       />
-      <Route
-        path="/signup"
-        element={<PublicRoute><Signup /></PublicRoute>}
-      />
+      <Route path="/signup" element={<Navigate to="/login" replace />} />
       <Route
         path="/dashboard"
         element={<ProtectedRoute><Dashboard /></ProtectedRoute>}
