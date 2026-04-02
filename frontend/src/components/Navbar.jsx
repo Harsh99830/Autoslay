@@ -13,7 +13,10 @@ export default function Navbar({ onLogout }) {
 
   return (
     <nav className="navbar">
-      <div className="navbar__logo">⚡ AutoSlay</div>
+      <div className="navbar__logo">
+        <div className="navbar__logo-mark">⚡</div>
+        AUTOSLAY
+      </div>
 
       <div className="navbar__right">
         <div className="navbar__avatar" title={user?.name}>

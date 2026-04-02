@@ -1,66 +1,91 @@
-/* ─── Navbar ──────────────────────────────────────────────────────── */
+/* ─── Navbar ─── Light Blue Theme ────────────────────────────────── */
 .navbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 28px;
-  height: 60px;
-  background: rgba(10, 9, 22, 0.85);
-  border-bottom: 1px solid var(--border);
-  backdrop-filter: blur(12px);
+  padding: 0 32px;
+  height: 62px;
+  background: rgba(240, 248, 255, 0.88);
+  border-bottom: 1.5px solid var(--border);
+  backdrop-filter: blur(16px);
   position: sticky;
   top: 0;
   z-index: 100;
+  box-shadow: 0 2px 16px rgba(26, 127, 196, 0.07);
 }
 
 .navbar__logo {
-  font-size: 17px;
-  font-weight: 800;
+  font-family: 'Space Mono', monospace;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: 0.06em;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.navbar__logo-mark {
+  width: 30px;
+  height: 30px;
   background: var(--grad);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  letter-spacing: -0.3px;
+  border-radius: 8px;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 900;
+  box-shadow: 0 4px 12px rgba(26, 127, 196, 0.3);
 }
 
 .navbar__right {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
 }
 
 .navbar__avatar {
-  width: 34px; height: 34px;
-  border-radius: 50%;
+  width: 34px;
+  height: 34px;
   background: var(--grad);
+  border-radius: 50%;
+  color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 800;
-  color: #fff;
-  letter-spacing: 0.5px;
+  font-family: 'Space Mono', monospace;
+  letter-spacing: 0.05em;
   cursor: default;
+  flex-shrink: 0;
+  box-shadow: 0 3px 10px rgba(26, 127, 196, 0.28);
 }
 
 .navbar__name {
   font-size: 13px;
   font-weight: 600;
-  color: var(--text);
+  color: var(--text2);
+  font-family: 'Space Grotesk', sans-serif;
 }
 
 .navbar__logout {
-  background: rgba(255,255,255,0.06);
-  border: 1px solid var(--border);
+  background: transparent;
+  border: 1.5px solid var(--border);
   border-radius: 8px;
   color: var(--muted);
-  font-size: 12px;
-  padding: 6px 12px;
+  font-size: 11px;
+  padding: 7px 16px;
   cursor: pointer;
-  transition: background 0.2s, color 0.2s;
-  font-family: inherit;
+  transition: border-color 0.2s, color 0.2s, background 0.2s;
+  font-family: 'Space Mono', monospace;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
+
 .navbar__logout:hover {
-  background: rgba(248, 113, 113, 0.12);
-  color: #fca5a5;
-  border-color: rgba(248, 113, 113, 0.3);
+  border-color: rgba(242, 92, 61, 0.4);
+  color: #c0391e;
+  background: rgba(242, 92, 61, 0.06);
 }

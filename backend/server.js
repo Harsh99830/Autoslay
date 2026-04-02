@@ -89,11 +89,30 @@ app.get('/user', authMiddleware, async (req, res) => {
       phone_numbers: profile?.phone_numbers || [],
       resumes: profile?.resumes || [],
       linkedin: profile?.linkedin || '',
-      website: profile?.website || '',
       github: profile?.github || '',
+      website: profile?.website || '',
+      // Address
       address: profile?.address || '',
+      city: profile?.city || '',
+      state: profile?.state || '',
+      country: profile?.country || '',
+      pincode: profile?.pincode || '',
+      // Education
       college: profile?.college || '',
       degree: profile?.degree || '',
+      branch: profile?.branch || '',
+      graduation_year: profile?.graduation_year || '',
+      cgpa: profile?.cgpa || '',
+      // Personal
+      date_of_birth: profile?.date_of_birth || '',
+      gender: profile?.gender || '',
+      nationality: profile?.nationality || '',
+      // Professional
+      current_company: profile?.current_company || '',
+      job_title: profile?.job_title || '',
+      years_of_experience: profile?.years_of_experience || '',
+      skills: profile?.skills || [],
+      languages: profile?.languages || [],
     };
 
     res.json(userData);
@@ -105,7 +124,15 @@ app.get('/user', authMiddleware, async (req, res) => {
 
 // Update user profile
 app.post('/user/update', authMiddleware, async (req, res) => {
-  const { name, emails, phone_numbers, linkedin, website, github, address, college, degree } = req.body;
+  const {
+    name, emails, phone_numbers,
+    linkedin, github, website,
+    address, city, state, country, pincode,
+    college, degree, branch, graduation_year, cgpa,
+    date_of_birth, gender, nationality,
+    current_company, job_title, years_of_experience,
+    skills, languages
+  } = req.body;
   const userId = req.user.id;
 
   console.log('Update request body:', req.body);
@@ -127,15 +154,13 @@ app.post('/user/update', authMiddleware, async (req, res) => {
       result = await supabase
         .from('profiles')
         .update({
-          name,
-          emails,
-          phone_numbers,
-          linkedin,
-          website,
-          github,
-          address,
-          college,
-          degree,
+          name, emails, phone_numbers,
+          linkedin, github, website,
+          address, city, state, country, pincode,
+          college, degree, branch, graduation_year, cgpa,
+          date_of_birth, gender, nationality,
+          current_company, job_title, years_of_experience,
+          skills, languages,
           updated_at: new Date().toISOString()
         })
         .eq('id', userId)
@@ -147,15 +172,13 @@ app.post('/user/update', authMiddleware, async (req, res) => {
         .from('profiles')
         .insert({
           id: userId,
-          name,
-          emails,
-          phone_numbers,
-          linkedin,
-          website,
-          github,
-          address,
-          college,
-          degree,
+          name, emails, phone_numbers,
+          linkedin, github, website,
+          address, city, state, country, pincode,
+          college, degree, branch, graduation_year, cgpa,
+          date_of_birth, gender, nationality,
+          current_company, job_title, years_of_experience,
+          skills, languages,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
         })
@@ -167,19 +190,35 @@ app.post('/user/update', authMiddleware, async (req, res) => {
 
     if (result.error) throw result.error;
 
+    const d = result.data || {};
     const userData = {
       id: userId,
       email: req.user.email,
-      name: result.data?.name || name || '',
-      emails: result.data?.emails || emails || [],
-      phone_numbers: result.data?.phone_numbers || phone_numbers || [],
-      resumes: result.data?.resumes || [],
-      linkedin: result.data?.linkedin || linkedin || '',
-      website: result.data?.website || website || '',
-      github: result.data?.github || github || '',
-      address: result.data?.address || address || '',
-      college: result.data?.college || college || '',
-      degree: result.data?.degree || degree || '',
+      name: d.name || name || '',
+      emails: d.emails || emails || [],
+      phone_numbers: d.phone_numbers || phone_numbers || [],
+      resumes: d.resumes || [],
+      linkedin: d.linkedin || linkedin || '',
+      github: d.github || github || '',
+      website: d.website || website || '',
+      address: d.address || address || '',
+      city: d.city || city || '',
+      state: d.state || state || '',
+      country: d.country || country || '',
+      pincode: d.pincode || pincode || '',
+      college: d.college || college || '',
+      degree: d.degree || degree || '',
+      branch: d.branch || branch || '',
+      graduation_year: d.graduation_year || graduation_year || '',
+      cgpa: d.cgpa || cgpa || '',
+      date_of_birth: d.date_of_birth || date_of_birth || '',
+      gender: d.gender || gender || '',
+      nationality: d.nationality || nationality || '',
+      current_company: d.current_company || current_company || '',
+      job_title: d.job_title || job_title || '',
+      years_of_experience: d.years_of_experience || years_of_experience || '',
+      skills: d.skills || skills || [],
+      languages: d.languages || languages || [],
     };
 
     res.json(userData);

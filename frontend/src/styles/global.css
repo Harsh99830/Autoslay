@@ -1,16 +1,41 @@
 /* ─── Global Reset & Variables ─────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
+
 :root {
-  --bg:        #0a0916;
-  --bg2:       #110f20;
-  --bg3:       #1a1733;
-  --border:    rgba(255, 255, 255, 0.09);
-  --purple:    #7c5cfc;
-  --pink:      #f472b6;
-  --grad:      linear-gradient(135deg, #7c5cfc, #f472b6);
-  --text:      #f0eeff;
-  --muted:     rgba(240, 238, 255, 0.45);
-  --radius:    14px;
-  --shadow:    0 24px 60px rgba(0,0,0,0.55);
+  /* ── Core Palette ── */
+  --bg:         #e8f4fd;
+  --bg2:        #f0f8ff;
+  --bg3:        #daeefa;
+  --bg4:        #cce5f5;
+  --border:     rgba(30, 120, 190, 0.14);
+  --border-hover: rgba(30, 120, 190, 0.35);
+
+  /* ── Accent Colors ── */
+  --blue:       #1a7fc4;
+  --blue-light: #4fa8e0;
+  --blue-pale:  #b8dcf5;
+  --teal:       #0d9e8a;
+  --coral:      #f25c3d;
+  --amber:      #f5a623;
+  --indigo:     #3d5af1;
+
+  /* ── Gradients ── */
+  --grad:        linear-gradient(135deg, #1a7fc4, #0d9e8a);
+  --grad-soft:   linear-gradient(135deg, #4fa8e0 0%, #0d9e8a 100%);
+  --grad-warm:   linear-gradient(135deg, #f25c3d, #f5a623);
+
+  /* ── Text ── */
+  --text:       #000000;
+  --text2:      #1a1a1a;
+  --muted:      rgba(0, 0, 0, 0.45);
+  --muted2:     rgba(0, 0, 0, 0.28);
+
+  /* ── Misc ── */
+  --radius:     10px;
+  --radius-sm:  6px;
+  --shadow:     0 20px 60px rgba(26, 127, 196, 0.14), 0 4px 20px rgba(0,0,0,0.06);
+  --shadow-sm:  0 4px 16px rgba(26, 127, 196, 0.1);
+  --grid-line:  rgba(26, 127, 196, 0.06);
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -19,18 +44,18 @@ html, body, #root {
   height: 100%;
   background: var(--bg);
   color: var(--text);
-  font-family: 'DM Sans', 'Segoe UI', sans-serif;
+  font-family: 'Space Grotesk', 'Segoe UI', sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
-a { color: var(--purple); text-decoration: none; }
-a:hover { text-decoration: underline; }
+a { color: var(--blue); text-decoration: none; }
+a:hover { color: var(--teal); text-decoration: underline; }
 
 /* ─── Spinner ──────────────────────────────────────────────────────── */
 .spinner {
   display: inline-block;
   width: 16px; height: 16px;
-  border: 2px solid rgba(255,255,255,0.3);
+  border: 2px solid rgba(255,255,255,0.35);
   border-top-color: #fff;
   border-radius: 50%;
   animation: spin 0.6s linear infinite;
@@ -42,30 +67,35 @@ a:hover { text-decoration: underline; }
 .field-group {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 7px;
 }
 .field-group label {
-  font-size: 11px;
+  font-size: 10px;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--muted);
-  font-weight: 600;
+  letter-spacing: 0.14em;
+  color: var(--blue);
+  font-weight: 700;
+  font-family: 'Space Mono', monospace;
 }
 .field-group input,
 .field-group textarea {
-  background: var(--bg3);
-  border: 1px solid var(--border);
-  border-radius: 10px;
+  background: #fff;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
   padding: 11px 14px;
   color: var(--text);
   font-size: 14px;
   outline: none;
-  transition: border-color 0.2s;
-  font-family: inherit;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  font-family: 'Space Grotesk', sans-serif;
 }
 .field-group input:focus,
 .field-group textarea:focus {
-  border-color: var(--purple);
-  box-shadow: 0 0 0 3px rgba(124, 92, 252, 0.18);
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(26, 127, 196, 0.12);
+  background: #fff;
 }
-.field-group input::placeholder { color: rgba(255,255,255,0.25); }
+.field-group input::placeholder,
+.field-group textarea::placeholder {
+  color: var(--muted2);
+}
