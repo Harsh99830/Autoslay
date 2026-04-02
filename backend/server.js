@@ -149,42 +149,42 @@ app.post('/user/update', authMiddleware, async (req, res) => {
     console.log('Existing profile:', existingProfile);
 
     let result;
-    if (existingProfile) {
-      // Update existing profile
-      result = await supabase
-        .from('profiles')
-        .update({
-          name, emails, phone_numbers,
-          linkedin, github, website,
-          address, city, state, country, pincode,
-          college, degree, branch, graduation_year, cgpa,
-          date_of_birth, gender, nationality,
-          current_company, job_title, years_of_experience,
-          skills, languages,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', userId)
-        .select()
-        .single();
-    } else {
-      // Insert new profile
-      result = await supabase
-        .from('profiles')
-        .insert({
-          id: userId,
-          name, emails, phone_numbers,
-          linkedin, github, website,
-          address, city, state, country, pincode,
-          college, degree, branch, graduation_year, cgpa,
-          date_of_birth, gender, nationality,
-          current_company, job_title, years_of_experience,
-          skills, languages,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        })
-        .select()
-        .single();
+    
+    // Use RPC function that bypasses RLS via SECURITY DEFINER
+    const { data, error } = await supabase.rpc('upsert_profile_admin', {
+      p_user_id: userId,
+      p_name: name,
+      p_emails: emails,
+      p_phone_numbers: phone_numbers,
+      p_linkedin: linkedin,
+      p_github: github,
+      p_website: website,
+      p_address: address,
+      p_city: city,
+      p_state: state,
+      p_country: country,
+      p_pincode: pincode,
+      p_college: college,
+      p_degree: degree,
+      p_branch: branch,
+      p_graduation_year: graduation_year,
+      p_cgpa: cgpa,
+      p_date_of_birth: date_of_birth,
+      p_gender: gender,
+      p_nationality: nationality,
+      p_current_company: current_company,
+      p_job_title: job_title,
+      p_years_of_experience: years_of_experience,
+      p_skills: skills,
+      p_languages: languages
+    });
+    
+    if (error) {
+      console.log('RPC error:', error);
+      throw error;
     }
+    
+    result = { data, error: null };
 
     console.log('Supabase result:', result);
 
@@ -224,7 +224,10 @@ app.post('/user/update', authMiddleware, async (req, res) => {
     res.json(userData);
   } catch (err) {
     console.error('Error updating user:', err);
-    res.status(500).json({ error: 'Failed to update profile' });
+    console.error('Error details:', err.message, err.stack);
+    if (err.code) console.error('Error code:', err.code);
+    if (err.details) console.error('Error details:', err.details);
+    res.status(500).json({ error: 'Failed to update profile', details: err.message });
   }
 });
 

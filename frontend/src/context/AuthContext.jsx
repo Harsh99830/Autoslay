@@ -38,18 +38,44 @@ export function AuthProvider({ children }) {
       });
       if (!res.ok) throw new Error("Failed to fetch user");
       const data = await res.json();
-      // Sync with extension via postMessage (bridge.js content script will forward to background)
-      window.postMessage({
-        type: 'AUTOSLAY_SAVE_USER',
-        user: data,
-        token: token,
-      }, window.location.origin);
+      syncWithExtension(data, token);
       setUser(data);
     } catch (err) {
       console.error("Error fetching user:", err);
       setUser(null);
     } finally {
       setLoading(false);
+    }
+  }
+
+  // ─── Sync user data to the Chrome extension safely ──────────────────────
+  // Wrapped in its own function so any extension errors NEVER propagate
+  // up into the save/upload flows and cause false "Failed to save" toasts.
+  function syncWithExtension(userData, token) {
+    try {
+      // postMessage bridge (content script listens for this)
+      window.postMessage(
+        { type: "AUTOSLAY_SAVE_USER", user: userData, token },
+        window.location.origin
+      );
+    } catch (_) {
+      // Silently ignore — extension may not be installed
+    }
+
+    try {
+      if (
+        typeof window !== "undefined" &&
+        window.chrome &&
+        typeof window.chrome.runtime?.sendMessage === "function"
+      ) {
+        window.chrome.runtime.sendMessage({
+          type: "SAVE_USER_DATA",
+          user: userData,
+          token,
+        });
+      }
+    } catch (_) {
+      // Silently ignore — extension may not be installed or ID may differ
     }
   }
 
@@ -64,10 +90,7 @@ export function AuthProvider({ children }) {
   }
 
   async function login(email, password) {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) throw new Error(error.message);
   }
 
@@ -75,16 +98,14 @@ export function AuthProvider({ children }) {
     const { error } = await supabase.auth.signUp({
       email,
       password,
-      options: {
-        data: { full_name: name },
-      },
+      options: { data: { full_name: name } },
     });
     if (error) throw new Error(error.message);
   }
 
   async function updateUser(updates) {
     if (!session?.access_token) throw new Error("Not authenticated");
-    
+
     const res = await fetch(`${API_BASE}/user/update`, {
       method: "POST",
       headers: {
@@ -93,30 +114,24 @@ export function AuthProvider({ children }) {
       },
       body: JSON.stringify(updates),
     });
-    if (!res.ok) throw new Error("Update failed");
+
+    if (!res.ok) {
+      const errBody = await res.json().catch(() => ({}));
+      throw new Error(errBody.error || "Update failed");
+    }
+
     const updated = await res.json();
     setUser(updated);
 
-    if (window.chrome?.runtime?.sendMessage) {
-      chrome.runtime.sendMessage({
-        type: "SAVE_USER_DATA",
-        user: updated,
-        token: session.access_token,
-      });
-    }
+    // Sync with extension — errors here must NOT bubble up to the UI
+    syncWithExtension(updated, session.access_token);
 
-    // Also postMessage for extension bridge
-    window.postMessage({
-      type: 'AUTOSLAY_SAVE_USER',
-      user: updated,
-      token: session.access_token,
-    }, window.location.origin);
     return updated;
   }
 
   async function uploadResume(file) {
     if (!session?.access_token) throw new Error("Not authenticated");
-    
+
     const formData = new FormData();
     formData.append("resume", file);
     const res = await fetch(`${API_BASE}/upload-resume`, {
@@ -124,7 +139,12 @@ export function AuthProvider({ children }) {
       headers: { Authorization: `Bearer ${session.access_token}` },
       body: formData,
     });
-    if (!res.ok) throw new Error("Upload failed");
+
+    if (!res.ok) {
+      const errBody = await res.json().catch(() => ({}));
+      throw new Error(errBody.error || "Upload failed");
+    }
+
     const result = await res.json();
     await fetchUser(session.access_token);
     return result;
@@ -134,8 +154,10 @@ export function AuthProvider({ children }) {
     await supabase.auth.signOut();
     setUser(null);
     setSession(null);
-    
-    window.postMessage({ type: 'AUTOSLAY_LOGOUT' }, window.location.origin);
+
+    try {
+      window.postMessage({ type: "AUTOSLAY_LOGOUT" }, window.location.origin);
+    } catch (_) {}
   }
 
   return (
