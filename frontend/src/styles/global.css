@@ -1,41 +1,42 @@
-/* ─── Global Reset & Variables ─────────────────────────────────────── */
+/* ─── Global Reset & Variables ─── Dark Theme ──────────────────────── */
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
 
 :root {
-  /* ── Core Palette ── */
-  --bg:         #e8f4fd;
-  --bg2:        #f0f8ff;
-  --bg3:        #daeefa;
-  --bg4:        #cce5f5;
-  --border:     rgba(30, 120, 190, 0.14);
-  --border-hover: rgba(30, 120, 190, 0.35);
+  /* ── Core Palette (Dark) ── */
+  --bg:           #0f1011;
+  --bg2:          #161819;
+  --bg3:          #1c1e20;
+  --bg4:          #232629;
+  --surface:      #1a1c1e;
+  --surface2:     #222426;
+
+  /* ── Borders ── */
+  --border:       rgba(255, 255, 255, 0.08);
+  --border-hover: rgba(0, 229, 199, 0.35);
 
   /* ── Accent Colors ── */
-  --blue:       #1a7fc4;
-  --blue-light: #4fa8e0;
-  --blue-pale:  #b8dcf5;
-  --teal:       #0d9e8a;
-  --coral:      #f25c3d;
-  --amber:      #f5a623;
-  --indigo:     #3d5af1;
+  --cyan:         #00e5c7;
+  --cyan-dim:     rgba(0, 229, 199, 0.15);
+  --cyan-glow:    rgba(0, 229, 199, 0.25);
+  --teal:         #0d9e8a;
+  --muted-teal:   #1a5c54;
 
   /* ── Gradients ── */
-  --grad:        linear-gradient(135deg, #1a7fc4, #0d9e8a);
-  --grad-soft:   linear-gradient(135deg, #4fa8e0 0%, #0d9e8a 100%);
-  --grad-warm:   linear-gradient(135deg, #f25c3d, #f5a623);
+  --grad:         linear-gradient(135deg, #00c4aa, #00e5c7);
+  --grad-hero:    linear-gradient(135deg, #0d2520 0%, #0d3530 50%, #1a4a40 100%);
 
   /* ── Text ── */
-  --text:       #000000;
-  --text2:      #1a1a1a;
-  --muted:      rgba(0, 0, 0, 0.45);
-  --muted2:     rgba(0, 0, 0, 0.28);
+  --text:         #ffffff;
+  --text2:        rgba(255, 255, 255, 0.85);
+  --muted:        rgba(255, 255, 255, 0.45);
+  --muted2:       rgba(255, 255, 255, 0.28);
+  --label:        rgba(255, 255, 255, 0.35);
 
   /* ── Misc ── */
-  --radius:     10px;
-  --radius-sm:  6px;
-  --shadow:     0 20px 60px rgba(26, 127, 196, 0.14), 0 4px 20px rgba(0,0,0,0.06);
-  --shadow-sm:  0 4px 16px rgba(26, 127, 196, 0.1);
-  --grid-line:  rgba(26, 127, 196, 0.06);
+  --radius:       10px;
+  --radius-sm:    7px;
+  --shadow:       0 20px 60px rgba(0, 0, 0, 0.5);
+  --shadow-sm:    0 4px 16px rgba(0, 0, 0, 0.3);
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -48,14 +49,14 @@ html, body, #root {
   -webkit-font-smoothing: antialiased;
 }
 
-a { color: var(--blue); text-decoration: none; }
-a:hover { color: var(--teal); text-decoration: underline; }
+a { color: var(--cyan); text-decoration: none; }
+a:hover { color: #fff; }
 
 /* ─── Spinner ──────────────────────────────────────────────────────── */
 .spinner {
   display: inline-block;
   width: 16px; height: 16px;
-  border: 2px solid rgba(255,255,255,0.35);
+  border: 2px solid rgba(255,255,255,0.25);
   border-top-color: #fff;
   border-radius: 50%;
   animation: spin 0.6s linear infinite;
@@ -73,27 +74,28 @@ a:hover { color: var(--teal); text-decoration: underline; }
   font-size: 10px;
   text-transform: uppercase;
   letter-spacing: 0.14em;
-  color: var(--blue);
+  color: var(--label);
   font-weight: 700;
   font-family: 'Space Mono', monospace;
 }
 .field-group input,
 .field-group textarea {
-  background: #fff;
+  background: var(--bg3);
   border: 1.5px solid var(--border);
   border-radius: var(--radius-sm);
-  padding: 11px 14px;
+  padding: 13px 16px;
   color: var(--text);
   font-size: 14px;
+  font-weight: 500;
   outline: none;
   transition: border-color 0.2s, box-shadow 0.2s;
   font-family: 'Space Grotesk', sans-serif;
+  width: 100%;
 }
 .field-group input:focus,
 .field-group textarea:focus {
-  border-color: var(--blue);
-  box-shadow: 0 0 0 3px rgba(26, 127, 196, 0.12);
-  background: #fff;
+  border-color: var(--cyan);
+  box-shadow: 0 0 0 3px var(--cyan-glow);
 }
 .field-group input::placeholder,
 .field-group textarea::placeholder {
