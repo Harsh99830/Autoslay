@@ -394,6 +394,63 @@
   function showSelectionPanel(user, detectedFields, onConfirm) {
     document.getElementById("__autoslay_select_panel")?.remove();
     document.getElementById("__autoslay_backdrop")?.remove();
+    document.getElementById("__autoslay_style")?.remove();
+
+    // Inject custom checkbox styles
+    const style = document.createElement("style");
+    style.id = "__autoslay_style";
+    style.textContent = `
+      @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap');
+
+      #__autoslay_select_panel * { box-sizing: border-box; font-family: 'Space Grotesk', 'Segoe UI', sans-serif; }
+
+      /* Custom checkbox */
+      .__as_chk_wrap { position:relative; width:22px; height:22px; flex-shrink:0; cursor:pointer; }
+      .__as_chk_wrap input[type=checkbox] {
+        position:absolute; opacity:0; width:0; height:0; pointer-events:none;
+      }
+      .__as_chk_box {
+        width:22px; height:22px;
+        background:#000;
+        border:2px solid rgba(255,255,255,0.55);
+        border-radius:5px;
+        display:flex; align-items:center; justify-content:center;
+        cursor:pointer;
+        transition:border-color 0.15s;
+      }
+      .__as_chk_wrap:hover .__as_chk_box { border-color:rgba(255,255,255,0.9); }
+      .__as_chk_wrap input:checked + .__as_chk_box { border-color:rgba(255,255,255,0.7); }
+      .__as_chk_tick {
+        display:none;
+        width:12px; height:12px;
+      }
+      .__as_chk_wrap input:checked + .__as_chk_box .__as_chk_tick { display:block; }
+
+      /* Row hover */
+      .__as_row { transition: background 0.15s; }
+      .__as_row:hover { background: rgba(255,255,255,0.06) !important; }
+
+      /* Scrollbar */
+      #__autoslay_select_panel::-webkit-scrollbar { width:4px; }
+      #__autoslay_select_panel::-webkit-scrollbar-track { background:transparent; }
+      #__autoslay_select_panel::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.1); border-radius:2px; }
+
+      /* Buttons */
+      #__autoslay_cancel:hover { background:rgba(255,255,255,0.14) !important; }
+      #__autoslay_fill:hover   { opacity:0.88; transform:translateY(-1px); }
+      #__autoslay_fill         { transition:opacity 0.15s, transform 0.15s; }
+
+      /* Select dropdown */
+      .__as_select {
+        flex:1; min-width:0; padding:6px 10px;
+        background:#0a0a0a; border:1px solid rgba(255,255,255,0.15);
+        border-radius:6px; color:#fff; font-size:12px;
+        font-family:'Space Grotesk',sans-serif;
+        cursor:pointer; outline:none;
+      }
+      .__as_select:focus { border-color:rgba(0,229,200,0.4); }
+    `;
+    document.head.appendChild(style);
 
     const detectedTypes = new Set(detectedFields.map(f => f.type));
     const cityStateValue = [user.city, user.state].filter(Boolean).join(", ");
@@ -430,78 +487,150 @@
       { type: "website",       label: "Website / Portfolio",  value: user.website },
     ];
 
-    const fillableFields = PANEL_FIELDS.filter(f =>
-      f.value && String(f.value).trim().length > 0 && detectedTypes.has(f.type)
-    );
+    const fillableFields = PANEL_FIELDS.filter(f => {
+      const hasValue = f.value && String(f.value).trim().length > 0;
+      const isDetected = detectedTypes.has(f.type);
+      
+      // Debug phone field specifically
+      if (f.type === "phone") {
+        console.log("[AutoSlay] Phone field debug:", {
+          type: f.type,
+          value: f.value,
+          options: f.options,
+          hasValue,
+          isDetected
+        });
+      }
+      
+      return hasValue && isDetected;
+    });
+
+    // ── Tick SVG (white) ──
+    const tickSVG = `<svg class="__as_chk_tick" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <polyline points="1.5,6 4.5,9 10.5,3" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>`;
+
+    const customCheckbox = (id) => `
+      <label class="__as_chk_wrap" for="${id}">
+        <input type="checkbox" id="${id}" checked />
+        <div class="__as_chk_box">${tickSVG}</div>
+      </label>`;
 
     const panel = document.createElement("div");
     panel.id = "__autoslay_select_panel";
     panel.style.cssText = `
-      position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
-      z-index:2147483647;width:400px;max-height:82vh;overflow-y:auto;
-      background:#0f0e17;border:1px solid rgba(255,255,255,0.15);
-      border-radius:16px;padding:24px;
-      font-family:'Segoe UI',sans-serif;color:#fff;
-      box-shadow:0 20px 60px rgba(0,0,0,0.6);
+      position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
+      z-index:2147483647; width:420px; max-height:84vh; overflow-y:auto;
+      background:#1a1c20;
+      border:1px solid rgba(255,255,255,0.08);
+      border-radius:18px; padding:0;
+      color:#fff;
+      box-shadow:0 24px 80px rgba(0,0,0,0.75);
     `;
 
     if (fillableFields.length === 0) {
       panel.innerHTML = `
-        <div style="font-size:18px;font-weight:700;text-align:center;margin-bottom:8px;">⚡ No Matches</div>
-        <div style="font-size:13px;color:rgba(255,255,255,0.5);text-align:center;margin-bottom:20px;">
-          No fields on this page match your saved profile.<br>Try completing more fields in your dashboard.
-        </div>
-        <button id="__autoslay_cancel" style="width:100%;padding:12px;background:rgba(255,255,255,0.1);
-          border:none;border-radius:10px;color:#fff;font-size:14px;cursor:pointer;">Close</button>`;
+        <div style="padding:32px 28px;text-align:center;">
+          <div style="width:44px;height:44px;background:#00e5c8;border-radius:12px;
+            display:flex;align-items:center;justify-content:center;
+            margin:0 auto 16px;font-size:22px;">⚡</div>
+          <div style="font-size:18px;font-weight:700;margin-bottom:8px;">No Matches Found</div>
+          <div style="font-size:13px;color:rgba(255,255,255,0.4);line-height:1.6;margin-bottom:24px;">
+            No fields on this page match your saved profile.<br>
+            Try completing more fields in your dashboard.
+          </div>
+          <button id="__autoslay_cancel"
+            style="width:100%;padding:13px;background:rgba(255,255,255,0.08);
+            border:1px solid rgba(255,255,255,0.1);border-radius:10px;
+            color:#fff;font-size:14px;font-weight:600;cursor:pointer;">Close</button>
+        </div>`;
     } else {
       const rows = fillableFields.map((f, i) => {
-        const id = `__asf_${i}`;
+        const id = `__asf_${i}_chk`;
         const multi = f.options && f.options.length > 1;
+
+        // Truncate long values
+        const displayVal = String(f.value).length > 38
+          ? String(f.value).slice(0, 36) + "…"
+          : String(f.value);
+
         const valueHtml = multi
-          ? `<select id="${id}_sel" style="flex:1;min-width:0;padding:7px 10px;background:#1a1929;
-               border:1px solid rgba(255,255,255,0.15);border-radius:6px;color:#fff;font-size:12px;">
+          ? `<select id="__asf_${i}_sel" class="__as_select">
                ${f.options.map(o => `<option value="${o}">${o}</option>`).join("")}
              </select>`
-          : `<span style="flex:1;font-size:12px;color:rgba(255,255,255,0.75);
-               overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${String(f.value)}</span>`;
+          : `<span style="flex:1;font-size:13px;font-weight:500;color:rgba(255,255,255,0.85);
+               overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${displayVal}</span>`;
+
         return `
           <div class="__as_row" data-idx="${i}" data-type="${f.type}"
-            style="display:flex;align-items:center;gap:10px;padding:9px 10px;
-            background:rgba(255,255,255,0.05);border-radius:8px;margin-bottom:7px;">
-            <input type="checkbox" id="${id}_chk" checked
-              style="width:16px;height:16px;accent-color:#7c5cfc;cursor:pointer;flex-shrink:0;">
-            <label for="${id}_chk"
-              style="font-size:11px;color:rgba(255,255,255,0.5);text-transform:uppercase;
-              letter-spacing:.06em;min-width:110px;cursor:pointer;flex-shrink:0;">${f.label}</label>
-            ${valueHtml}
+            style="display:flex;align-items:center;gap:14px;
+            padding:14px 18px;
+            border-bottom:1px solid rgba(255,255,255,0.05);">
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:9.5px;font-family:'Space Mono',monospace;
+                letter-spacing:0.16em;text-transform:uppercase;
+                color:rgba(255,255,255,0.35);margin-bottom:5px;">${f.label}</div>
+              <div style="display:flex;align-items:center;">${valueHtml}</div>
+            </div>
+            ${customCheckbox(id)}
           </div>`;
       }).join("");
 
       panel.innerHTML = `
-        <div style="font-size:17px;font-weight:700;text-align:center;margin-bottom:6px;">⚡ Confirm Fields to Fill</div>
-        <div style="font-size:12px;color:rgba(255,255,255,0.45);text-align:center;margin-bottom:18px;">
-          Uncheck anything you'd like to skip
+        <!-- Header -->
+        <div style="padding:24px 24px 20px;border-bottom:1px solid rgba(255,255,255,0.06);">
+          <div style="display:flex;align-items:center;gap:14px;margin-bottom:6px;">
+            <div style="width:40px;height:40px;background:#00e5c8;border-radius:10px;
+              display:flex;align-items:center;justify-content:center;
+              font-size:20px;flex-shrink:0;">⚡</div>
+            <div style="font-size:19px;font-weight:700;letter-spacing:-0.02em;">Confirm Fields to Fill</div>
+          </div>
+          <div style="font-size:12px;color:rgba(255,255,255,0.38);margin-left:54px;">
+            Uncheck anything you'd like to skip
+          </div>
         </div>
-        <div style="margin-bottom:18px;">${rows}</div>
-        <div style="display:flex;gap:10px;">
+
+        <!-- Field rows -->
+        <div style="background:#111316;margin:0;">${rows}</div>
+
+        <!-- Action buttons -->
+        <div style="display:flex;gap:10px;padding:16px 18px;">
           <button id="__autoslay_cancel"
-            style="flex:1;padding:11px;background:rgba(255,255,255,0.09);border:none;
-            border-radius:10px;color:#fff;font-size:14px;cursor:pointer;">Cancel</button>
+            style="flex:1;padding:13px;background:#252830;
+            border:1px solid rgba(255,255,255,0.08);border-radius:10px;
+            color:rgba(255,255,255,0.75);font-size:14px;font-weight:600;
+            cursor:pointer;transition:background 0.15s;">Cancel</button>
           <button id="__autoslay_fill"
-            style="flex:1;padding:11px;background:linear-gradient(135deg,#7c5cfc,#f472b6);
-            border:none;border-radius:10px;color:#fff;font-size:14px;font-weight:700;cursor:pointer;">
-            Fill Form ⚡</button>
+            style="flex:2;padding:13px;background:#00e5c8;
+            border:none;border-radius:10px;
+            color:#000;font-size:14px;font-weight:700;
+            cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;
+            box-shadow:0 4px 20px rgba(0,229,200,0.25);">
+            Fill Form
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+            </svg>
+          </button>
         </div>`;
     }
 
     const backdrop = document.createElement("div");
     backdrop.id = "__autoslay_backdrop";
-    backdrop.style.cssText = `position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:2147483646;`;
-    backdrop.onclick = () => { panel.remove(); backdrop.remove(); };
+    backdrop.style.cssText = `
+      position:fixed;inset:0;
+      background:rgba(0,0,0,0.65);
+      backdrop-filter:blur(4px);
+      -webkit-backdrop-filter:blur(4px);
+      z-index:2147483646;
+    `;
+    backdrop.onclick = () => { panel.remove(); backdrop.remove(); style.remove(); };
     document.body.appendChild(backdrop);
     document.body.appendChild(panel);
 
-    panel.querySelector("#__autoslay_cancel").onclick = () => { panel.remove(); backdrop.remove(); };
+    panel.querySelector("#__autoslay_cancel").onclick = () => {
+      panel.remove(); backdrop.remove(); style.remove();
+    };
+
     const fillBtn = panel.querySelector("#__autoslay_fill");
     if (fillBtn) {
       fillBtn.onclick = () => {
@@ -516,6 +645,7 @@
         });
         panel.remove();
         backdrop.remove();
+        style.remove();
         onConfirm(selected);
       };
     }
@@ -574,12 +704,13 @@
     `;
     t.textContent = message;
     document.body.appendChild(t);
-    setTimeout(() => t.remove(), 3000);
   }
 
   // ─── Message listener ──────────────────────────────────────────────────────
   chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     if (message.type === "FILL_FORM") {
+      console.log("[AutoSlay] User phone_numbers:", message.user.phone_numbers);
+      console.log("[AutoSlay] User data:", message.user);
       const detectedFields = detectFormFields();
       showSelectionPanel(message.user, detectedFields, (selected) => {
         fillFormWithUserData(message.user, selected);

@@ -2,182 +2,362 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AutoSlay</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap');
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      width: 320px;
-      min-height: 200px;
-      background: #0f0e17;
+      width: 280px;
+      background: #111214;
       color: #fff;
-      font-family: 'Segoe UI', sans-serif;
-      font-size: 13px;
-    }
-
-    .header {
-      padding: 16px 20px 12px;
-      border-bottom: 1px solid rgba(255,255,255,0.08);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .logo {
-      font-size: 16px;
-      font-weight: 800;
-      background: linear-gradient(135deg, #a78bfa, #f472b6);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      letter-spacing: -0.3px;
-    }
-
-    .status-dot {
-      width: 8px; height: 8px;
-      border-radius: 50%;
-      background: #22c55e;
-      box-shadow: 0 0 6px #22c55e;
-    }
-
-    .body { padding: 16px 20px; }
-
-    .user-card {
-      background: #1a1929;
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 12px;
-      padding: 14px 16px;
-      margin-bottom: 14px;
-    }
-
-    .user-name {
-      font-size: 15px;
-      font-weight: 700;
-      color: #fff;
-      margin-bottom: 2px;
-    }
-
-    .user-email {
+      font-family: 'Space Grotesk', 'Segoe UI', sans-serif;
       font-size: 12px;
-      color: rgba(255,255,255,0.45);
+      -webkit-font-smoothing: antialiased;
     }
 
-    .section-label {
-      font-size: 10px;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: rgba(255,255,255,0.35);
-      margin-bottom: 6px;
-    }
-
-    .pill-row {
+    /* ── Header ─────────────────────────────────────── */
+    .header {
       display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-bottom: 14px;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px 10px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
     }
 
-    .pill {
-      padding: 4px 10px;
-      background: rgba(108, 71, 255, 0.18);
-      border: 1px solid rgba(108, 71, 255, 0.35);
-      border-radius: 50px;
-      font-size: 11px;
-      color: #c4b5fd;
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
     }
 
-    .action-btn {
+    .avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #00e5c8, #0d9e8a);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 800;
+      color: #000;
+      font-family: 'Space Mono', monospace;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+
+    .avatar img {
       width: 100%;
-      padding: 11px;
-      border: none;
+      height: 100%;
+      object-fit: cover;
       border-radius: 10px;
+    }
+
+    .header-info { display: flex; flex-direction: column; gap: 2px; }
+
+    .header-name {
       font-size: 13px;
       font-weight: 700;
-      cursor: pointer;
-      transition: opacity 0.2s, transform 0.15s;
-      margin-bottom: 8px;
-    }
-    .action-btn:hover { opacity: 0.88; transform: translateY(-1px); }
-    .action-btn:active { transform: translateY(0); }
-
-    .btn-fill {
-      background: linear-gradient(135deg, #6C47FF, #FF4785);
       color: #fff;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
     }
 
-    .btn-secondary {
-      background: rgba(255,255,255,0.07);
-      color: rgba(255,255,255,0.7);
-      border: 1px solid rgba(255,255,255,0.1);
+    .header-email {
+      font-size: 8px;
+      color: rgba(255,255,255,0.38);
+      font-family: 'Space Mono', monospace;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
     }
 
-    .not-logged-in {
-      padding: 24px 20px;
-      text-align: center;
-    }
-
-    .not-logged-in p {
-      color: rgba(255,255,255,0.5);
-      margin-bottom: 16px;
-      font-size: 13px;
-      line-height: 1.5;
-    }
-
-    .divider {
-      height: 1px;
-      background: rgba(255,255,255,0.07);
-      margin: 12px 0;
-    }
-
-    .footer {
-      padding: 10px 20px;
-      border-top: 1px solid rgba(255,255,255,0.07);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .footer-text {
-      font-size: 10px;
-      color: rgba(255,255,255,0.25);
-    }
-
-    .logout-btn {
+    .settings-btn {
       background: none;
       border: none;
       color: rgba(255,255,255,0.3);
+      cursor: pointer;
+      padding: 6px;
+      border-radius: 8px;
+      transition: color 0.15s, background 0.15s;
+      display: flex;
+      align-items: center;
+    }
+    .settings-btn:hover { color: rgba(255,255,255,0.7); background: rgba(255,255,255,0.06); }
+
+    /* ── Brand strip ─────────────────────────────────── */
+    .brand-strip {
+      padding: 10px 14px 8px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+    }
+
+    .brand-strip-left {}
+
+    .brand-name {
+      font-family: 'Space Mono', monospace;
+      font-size: 18px;
+      font-weight: 700;
+      color: #00e5c8;
+      letter-spacing: 0.06em;
+      line-height: 1;
+    }
+
+    .brand-sub {
+      font-size: 7px;
+      color: rgba(255,255,255,0.25);
+      letter-spacing: 0.2em;
+      font-family: 'Space Mono', monospace;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+
+    .brand-line {
+      width: 52px;
+      height: 3px;
+      background: linear-gradient(90deg, #00e5c8, transparent);
+      border-radius: 2px;
+      margin-bottom: 6px;
+    }
+
+    /* ── Fill button ─────────────────────────────────── */
+    .fill-wrap { padding: 8px 14px 0; }
+
+    .fill-btn {
+      width: 100%;
+      padding: 12px;
+      background: #00e5c7;
+      border: none;
+      border-radius: 8px;
+      color: #0a0a0a;
+      font-size: 14px;
+      font-weight: 700;
+      font-family: 'Space Grotesk', sans-serif;
+      letter-spacing: -0.01em;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: opacity 0.18s, transform 0.15s, box-shadow 0.18s;
+      box-shadow: 0 4px 24px rgba(0,229,200,0.22);
+    }
+    .fill-btn:hover { opacity: 0.88; transform: translateY(-1px); box-shadow: 0 8px 28px rgba(0,229,200,0.32); }
+    .fill-btn:active { transform: translateY(0); }
+
+    .fill-btn svg { flex-shrink: 0; }
+
+    /* ── Vault section ───────────────────────────────── */
+    .vault-section { padding: 18px 18px 0; }
+
+    .vault-label {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 10px;
+      font-family: 'Space Mono', monospace;
+      letter-spacing: 0.18em;
+      color: rgba(255,255,255,0.35);
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .vault-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: #00e5c8;
+      box-shadow: 0 0 5px rgba(0,229,200,0.6);
+    }
+
+    /* emails card — full width */
+    .vault-card {
+      background: #1a1c20;
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin-bottom: 10px;
+    }
+
+    .vault-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .vault-card-title {
+      font-size: 9.5px;
+      font-family: 'Space Mono', monospace;
+      color: #00e5c8;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .vault-card-icon { color: rgba(255,255,255,0.2); display: flex; }
+
+    .pill-row { display: flex; flex-wrap: wrap; gap: 7px; }
+
+    .pill {
+      padding: 5px 12px;
+      background: #0f1113;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 7px;
+      font-size: 11.5px;
+      color: rgba(255,255,255,0.75);
+      font-family: 'Space Grotesk', sans-serif;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 150px;
+    }
+
+    /* phone + resumes side by side */
+    .vault-row-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .empty-text {
       font-size: 11px;
+      color: rgba(255,255,255,0.22);
+      font-family: 'Space Mono', monospace;
+    }
+
+    /* ── Open dashboard ──────────────────────────────── */
+    .dashboard-link-wrap { padding: 8px 14px 0; }
+
+    .dashboard-link-btn {
+      width: 100%;
+      padding: 10px;
+      background: #1a1c20;
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 8px;
+      color: #00e5c8;
+      font-size: 11px;
+      font-weight: 600;
+      font-family: 'Space Grotesk', sans-serif;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: background 0.15s;
+      text-decoration: none;
+    }
+    .dashboard-link-btn:hover { background: rgba(0,229,200,0.06); }
+
+    /* ── Sign out ────────────────────────────────────── */
+    .signout-wrap { padding: 10px 14px 2px; text-align: center; }
+
+    .signout-btn {
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.25);
+      font-size: 8px;
+      font-family: 'Space Mono', monospace;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
       cursor: pointer;
       transition: color 0.15s;
+      padding: 4px 0;
     }
-    .logout-btn:hover { color: #f87171; }
+    .signout-btn:hover { color: #f87171; }
 
+    /* ── Footer ──────────────────────────────────────── */
+    .footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 14px 10px;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      margin-top: 8px;
+    }
+
+    .footer-left {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 7px;
+      font-family: 'Space Mono', monospace;
+      color: rgba(255,255,255,0.22);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .footer-sync-dot {
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: #00e5c8;
+      box-shadow: 0 0 4px rgba(0,229,200,0.5);
+    }
+
+    .footer-version {
+      font-size: 7px;
+      font-family: 'Space Mono', monospace;
+      color: rgba(255,255,255,0.18);
+      letter-spacing: 0.1em;
+    }
+
+    /* ── Not logged in state ─────────────────────────── */
+    .not-logged {
+      padding: 24px 14px 16px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .not-logged-icon { color: rgba(255,255,255,0.12); margin-bottom: 4px; }
+
+    .not-logged p {
+      font-size: 11px;
+      color: rgba(255,255,255,0.4);
+      line-height: 1.6;
+      max-width: 200px;
+    }
+
+    .not-logged .fill-btn { font-size: 11px; padding: 10px; }
+
+    /* ── Toast ───────────────────────────────────────── */
     #toast {
       display: none;
       position: fixed;
-      bottom: 12px;
+      bottom: 14px;
       left: 50%;
       transform: translateX(-50%);
-      background: #1a1929;
-      border: 1px solid rgba(255,255,255,0.12);
-      color: #fff;
-      padding: 7px 14px;
+      background: #1a1c20;
+      border: 1px solid rgba(0,229,200,0.25);
+      color: #00e5c8;
+      padding: 7px 16px;
       border-radius: 8px;
-      font-size: 12px;
+      font-size: 11px;
+      font-family: 'Space Mono', monospace;
+      letter-spacing: 0.06em;
       white-space: nowrap;
+      z-index: 999;
     }
+
+    /* ── Spinner ─────────────────────────────────────── */
+    .spinner {
+      display: inline-block;
+      width: 14px; height: 14px;
+      border: 2px solid rgba(0,0,0,0.2);
+      border-top-color: #000;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      vertical-align: middle;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
-  <div class="header">
-    <div class="logo">⚡ AutoSlay</div>
-    <div class="status-dot" id="status-dot" style="background:#6b7280; box-shadow:none;"></div>
-  </div>
 
-  <div id="main-content">
-    <!-- filled by JS -->
-  </div>
-
+  <div id="main-content"></div>
   <div id="toast"></div>
 
   <script src="config.js"></script>
