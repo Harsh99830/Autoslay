@@ -6,7 +6,7 @@
   border: 1.5px solid var(--border);
   border-radius: var(--radius-sm);
   padding: 13px 16px;
-  color: var(--text);
+  color: var(--text) !important;
   font-size: 14px;
   font-weight: 500;
   outline: none;
@@ -399,6 +399,7 @@
   box-shadow: none !important;
   border-radius: 0 !important;
   padding: 14px 36px 14px 16px !important;
+  color: var(--text) !important;
 }
 
 /* ─── Resume ────────────────────────────────────────────────────────── */
