@@ -198,7 +198,7 @@ export default function Dashboard() {
             {matchesSearch("email communications") && (
               <div className="dash-section">
                 <div className="dash-section__header">
-                  <span className="dash-section__title">Communications</span>
+                  <span className="dash-section__title">Email</span>
                 </div>
                 {emails.map((email, index) => (
                   <div key={index} className="field-card">
@@ -234,7 +234,7 @@ export default function Dashboard() {
             {matchesSearch("phone verification") && (
               <div className="dash-section">
                 <div className="dash-section__header">
-                  <span className="dash-section__title">Verification</span>
+                  <span className="dash-section__title">Mobile number</span>
                 </div>
                 {phones.map((phone, index) => (
                   <div key={index} className="field-card">
@@ -455,7 +455,7 @@ export default function Dashboard() {
           <span className="dash-footer__dot" />
           END-TO-END ENCRYPTED IDENTITY VAULT
         </div>
-        <div className="dash-footer__right">AUTOSLAY ENGINE V4.2.0</div>
+        <div className="dash-footer__right">AUTOSLAY ENGINE V1.0.1</div>
       </div>
 
       {toast && <Toast message={toast.msg} type={toast.type} />}

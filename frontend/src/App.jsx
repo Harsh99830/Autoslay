@@ -4,6 +4,7 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import AuthCallback from "./pages/AuthCallback";
 import PrivacyPolicy from "./pages/Legal";
+import Contact from "./pages/Contact";
 import "./styles/global.css";
 
 function ProtectedRoute({ children }) {
@@ -38,6 +39,10 @@ function AppRoutes() {
       <Route
         path="/dashboard"
         element={<ProtectedRoute><Dashboard /></ProtectedRoute>}
+      />
+      <Route
+        path="/contact"
+        element={<ProtectedRoute><Contact /></ProtectedRoute>}
       />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

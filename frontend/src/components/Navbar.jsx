@@ -49,25 +49,20 @@ export default function Navbar({ onLogout }) {
   return (
     <nav className="navbar">
       <div className="navbar__logo">AUTOSLAY</div>
-      <div className="navbar__tier">PREMIUM TIER</div>
-
+      
       <div className="navbar__nav">
-        <a href="/dashboard" className="navbar__nav-item">
-          <span className="navbar__nav-icon"><NavIcon type="dashboard" /></span>
-          Dashboard
-        </a>
         <a href="/dashboard" className="navbar__nav-item active">
           <span className="navbar__nav-icon"><NavIcon type="identity" /></span>
-          Identity
+          Dashboard
         </a>
         <button className="navbar__nav-item">
           <span className="navbar__nav-icon"><NavIcon type="settings" /></span>
           Settings
         </button>
-        <button className="navbar__nav-item">
+        <a href="/contact" className="navbar__nav-item">
           <span className="navbar__nav-icon"><NavIcon type="help" /></span>
-          Help
-        </button>
+          Contact
+        </a>
       </div>
 
       <div className="navbar__bottom">
@@ -75,7 +70,15 @@ export default function Navbar({ onLogout }) {
           <div className="navbar__avatar">{initials}</div>
           <div className="navbar__user-info">
             <div className="navbar__name">{user?.name || "User"}</div>
-            <div className="navbar__role">PRO USER</div>
+            <div className="navbar__role">
+              {(() => {
+                const email = user?.emails?.[0] || user?.email || "No email";
+                if (email === "No email") return email;
+                if (email.length <= 20) return email;
+                // Show first 20 chars + ... at end
+                return `${email.slice(0, 20)}...`;
+              })()}
+            </div>
           </div>
         </div>
       </div>
