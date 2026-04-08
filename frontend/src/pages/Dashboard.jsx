@@ -29,14 +29,13 @@ const Icon = ({ type, size = 16 }) => {
 };
 
 export default function Dashboard() {
-  const { user, updateUser, uploadResume, logout } = useAuth();
+  const { user, updateUser, logout } = useAuth();
 
   // Identity
   const [name, setName] = useState(user?.name || "");
   const [emails, setEmails] = useState(user?.emails || []);
   const [phones, setPhones] = useState(user?.phone_numbers || []);
-  const [resumes] = useState(user?.resumes || []);
-
+  
   // Online presence
   const [linkedin, setLinkedin] = useState(user?.linkedin || "");
   const [github, setGithub] = useState(user?.github || "");
@@ -69,10 +68,8 @@ export default function Dashboard() {
   const [languages, setLanguages] = useState(user?.languages || []);
 
   const [saving, setSaving] = useState(false);
-  const [uploading, setUploading] = useState(false);
   const [toast, setToast] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const fileRef = useRef();
 
   const showToast = (msg, type = "success") => {
     setToast({ msg, type });
@@ -100,20 +97,7 @@ export default function Dashboard() {
     }
   };
 
-  const handleResumeUpload = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    setUploading(true);
-    try {
-      await uploadResume(file);
-      showToast("Resume uploaded!");
-    } catch {
-      showToast("Upload failed.", "error");
-    } finally {
-      setUploading(false);
-    }
-  };
-
+  
   const matchesSearch = (text) => {
     if (!searchQuery) return true;
     return text.toLowerCase().includes(searchQuery.toLowerCase());
@@ -460,29 +444,7 @@ export default function Dashboard() {
               </div>
             )}
 
-            {/* Resume */}
-            {matchesSearch("resume") && (
-              <div className="dash-section" style={{ gridColumn: "1 / -1" }}>
-                <div className="dash-section__header">
-                  <span className="dash-section__title">Resumes</span>
-                  <span className="dash-section__icon"><Icon type="file" size={16} /></span>
-                </div>
-                <div className="resume-list">
-                  {resumes.length === 0 && <p className="empty-state">No resumes uploaded yet.</p>}
-                  {resumes.map((url, i) => (
-                    <div className="resume-item" key={i}>
-                      <span className="resume-icon"><Icon type="file" size={14} /></span>
-                      <a href={url} target="_blank" rel="noreferrer">Resume {i + 1}</a>
-                    </div>
-                  ))}
-                </div>
-                <button className="upload-btn" onClick={() => fileRef.current.click()} disabled={uploading}>
-                  {uploading ? <span className="spinner" /> : <><span>+</span> Upload Resume (PDF)</>}
-                </button>
-                <input ref={fileRef} type="file" accept=".pdf,.doc,.docx" style={{ display: "none" }} onChange={handleResumeUpload} />
-              </div>
-            )}
-
+            
           </div>
         </div>
       </div>
