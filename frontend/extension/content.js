@@ -531,9 +531,7 @@
     if (fillableFields.length === 0) {
       panel.innerHTML = `
         <div style="padding:32px 28px;text-align:center;">
-          <div style="width:44px;height:44px;background:#00e5c8;border-radius:12px;
-            display:flex;align-items:center;justify-content:center;
-            margin:0 auto 16px;font-size:22px;">⚡</div>
+          <img src="${chrome.runtime.getURL('favicon.png')}" alt="AutoSlay" style="width:44px;height:44px;object-fit:contain;margin:0 auto 16px;display:block;" />
           <div style="font-size:18px;font-weight:700;margin-bottom:8px;">No Matches Found</div>
           <div style="font-size:13px;color:rgba(255,255,255,0.4);line-height:1.6;margin-bottom:24px;">
             No fields on this page match your saved profile.<br>
@@ -580,9 +578,7 @@
         <!-- Header -->
         <div style="padding:24px 24px 20px;border-bottom:1px solid rgba(255,255,255,0.06);">
           <div style="display:flex;align-items:center;gap:14px;margin-bottom:6px;">
-            <div style="width:40px;height:40px;background:#00e5c8;border-radius:10px;
-              display:flex;align-items:center;justify-content:center;
-              font-size:20px;flex-shrink:0;">⚡</div>
+            <img src="${chrome.runtime.getURL('favicon.png')}" alt="AutoSlay" style="width:40px;height:40px;object-fit:contain;flex-shrink:0;" />
             <div style="font-size:19px;font-weight:700;letter-spacing:-0.02em;">Confirm Fields to Fill</div>
           </div>
           <div style="font-size:12px;color:rgba(255,255,255,0.38);margin-left:54px;">
