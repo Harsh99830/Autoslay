@@ -5,13 +5,9 @@ NODE_VERSION = "18"
 nixPkgs = ["nodejs"]
 
 [phases.install]
-cmds = [
-  "cd backend",
-  "npm install"
-]
-
-[phases.build]
-cmds = []
+cmds = ["npm install"]
+workdir = "backend"
 
 [phases.start]
-cmd = "cd backend && npm start"
+cmd = "npm start"
+workdir = "backend"
