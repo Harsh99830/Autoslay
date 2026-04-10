@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "AutoSlay – Smart Form Filler",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Automatically detect and fill forms across any website using your saved profile.",
   "permissions": [
     "activeTab",
