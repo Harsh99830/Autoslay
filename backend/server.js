@@ -299,4 +299,4 @@ app.post('/auth/callback', async (req, res) => {
 });
 
 // Export for Vercel
-module.exports = app;
+export default app;
