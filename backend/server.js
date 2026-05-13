@@ -298,6 +298,5 @@ app.post('/auth/callback', async (req, res) => {
   res.json({ success: true });
 });
 
-app.listen(PORT, () => {
-  console.log(`🚀 AutoSlay backend running on http://localhost:${PORT}`);
-});
+// Export for Vercel
+module.exports = app;
