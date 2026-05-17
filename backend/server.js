@@ -1,4 +1,5 @@
 import express from 'express';
+import { encryptObject, decryptObject } from './crypto.js';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { createClient } from '@supabase/supabase-js';
@@ -91,39 +92,41 @@ app.get('/user', authMiddleware, async (req, res) => {
       throw error;
     }
 
-    // Combine auth user with profile data
+    // Decrypt all profile fields before sending to client
+    const p = decryptObject(profile || {}, ['id', 'created_at', 'updated_at']);
+
     const userData = {
       id: req.user.id,
       email: req.user.email,
-      name: profile?.name || req.user.user_metadata?.full_name || req.user.email?.split('@')[0] || '',
-      emails: profile?.emails || [req.user.email],
-      phone_numbers: profile?.phone_numbers || [],
-      resumes: profile?.resumes || [],
-      linkedin: profile?.linkedin || '',
-      github: profile?.github || '',
-      website: profile?.website || '',
+      name: p.name || req.user.user_metadata?.full_name || req.user.email?.split('@')[0] || '',
+      emails: p.emails || [req.user.email],
+      phone_numbers: p.phone_numbers || [],
+      resumes: p.resumes || [],
+      linkedin: p.linkedin || '',
+      github: p.github || '',
+      website: p.website || '',
       // Address
-      address: profile?.address || '',
-      city: profile?.city || '',
-      state: profile?.state || '',
-      country: profile?.country || '',
-      pincode: profile?.pincode || '',
+      address: p.address || '',
+      city: p.city || '',
+      state: p.state || '',
+      country: p.country || '',
+      pincode: p.pincode || '',
       // Education
-      college: profile?.college || '',
-      degree: profile?.degree || '',
-      branch: profile?.branch || '',
-      graduation_year: profile?.graduation_year || '',
-      cgpa: profile?.cgpa || '',
+      college: p.college || '',
+      degree: p.degree || '',
+      branch: p.branch || '',
+      graduation_year: p.graduation_year || '',
+      cgpa: p.cgpa || '',
       // Personal
-      date_of_birth: profile?.date_of_birth || '',
-      gender: profile?.gender || '',
-      nationality: profile?.nationality || '',
+      date_of_birth: p.date_of_birth || '',
+      gender: p.gender || '',
+      nationality: p.nationality || '',
       // Professional
-      current_company: profile?.current_company || '',
-      job_title: profile?.job_title || '',
-      years_of_experience: profile?.years_of_experience || '',
-      skills: profile?.skills || [],
-      languages: profile?.languages || [],
+      current_company: p.current_company || '',
+      job_title: p.job_title || '',
+      years_of_experience: p.years_of_experience || '',
+      skills: p.skills || [],
+      languages: p.languages || [],
     };
 
     res.json(userData);
@@ -161,33 +164,61 @@ app.post('/user/update', authMiddleware, async (req, res) => {
 
     let result;
     
+    // Encrypt all profile fields before writing to Supabase
+    const enc = encryptObject({
+      name,
+      emails,
+      phone_numbers,
+      linkedin,
+      github,
+      website,
+      address,
+      city,
+      state,
+      country,
+      pincode,
+      college,
+      degree,
+      branch,
+      graduation_year,
+      cgpa,
+      date_of_birth,
+      gender,
+      nationality,
+      current_company,
+      job_title,
+      years_of_experience,
+      skills,
+      languages,
+    });
+
     // Use RPC function that bypasses RLS via SECURITY DEFINER
     const { data, error } = await supabase.rpc('upsert_profile_admin', {
       p_user_id: userId,
-      p_name: name,
-      p_emails: emails,
-      p_phone_numbers: phone_numbers,
-      p_linkedin: linkedin,
-      p_github: github,
-      p_website: website,
-      p_address: address,
-      p_city: city,
-      p_state: state,
-      p_country: country,
-      p_pincode: pincode,
-      p_college: college,
-      p_degree: degree,
-      p_branch: branch,
-      p_graduation_year: graduation_year,
-      p_cgpa: cgpa,
-      p_date_of_birth: date_of_birth,
-      p_gender: gender,
-      p_nationality: nationality,
-      p_current_company: current_company,
-      p_job_title: job_title,
-      p_years_of_experience: years_of_experience,
-      p_skills: skills,
-      p_languages: languages
+      p_name: enc.name,
+      p_emails: enc.emails,
+      p_phone_numbers: enc.phone_numbers,
+      p_linkedin: enc.linkedin,
+      p_github: enc.github,
+      p_website: enc.website,
+      p_address: enc.address,
+      p_city: enc.city,
+      p_state: enc.state,
+      p_country: enc.country,
+      p_pincode: enc.pincode,
+      p_college: enc.college,
+      p_degree: enc.degree,
+      p_branch: enc.branch,
+      p_graduation_year: enc.graduation_year,
+      p_cgpa: enc.cgpa,
+      p_date_of_birth: enc.date_of_birth,
+      p_gender: enc.gender,
+      p_nationality: enc.nationality,
+      p_current_company: enc.current_company,
+      p_job_title: enc.job_title,
+      p_years_of_experience: enc.years_of_experience,
+      p_skills: enc.skills,
+      p_languages: enc.languages
     });
     
     if (error) {
@@ -201,35 +232,35 @@ app.post('/user/update', authMiddleware, async (req, res) => {
 
     if (result.error) throw result.error;
 
-    const d = result.data || {};
+    // Return the plain (unencrypted) values that the client just sent — no need to decrypt the RPC response
     const userData = {
       id: userId,
       email: req.user.email,
-      name: d.name || name || '',
-      emails: d.emails || emails || [],
-      phone_numbers: d.phone_numbers || phone_numbers || [],
-      resumes: d.resumes || [],
-      linkedin: d.linkedin || linkedin || '',
-      github: d.github || github || '',
-      website: d.website || website || '',
-      address: d.address || address || '',
-      city: d.city || city || '',
-      state: d.state || state || '',
-      country: d.country || country || '',
-      pincode: d.pincode || pincode || '',
-      college: d.college || college || '',
-      degree: d.degree || degree || '',
-      branch: d.branch || branch || '',
-      graduation_year: d.graduation_year || graduation_year || '',
-      cgpa: d.cgpa || cgpa || '',
-      date_of_birth: d.date_of_birth || date_of_birth || '',
-      gender: d.gender || gender || '',
-      nationality: d.nationality || nationality || '',
-      current_company: d.current_company || current_company || '',
-      job_title: d.job_title || job_title || '',
-      years_of_experience: d.years_of_experience || years_of_experience || '',
-      skills: d.skills || skills || [],
-      languages: d.languages || languages || [],
+      name: name || '',
+      emails: emails || [],
+      phone_numbers: phone_numbers || [],
+      resumes: result.data?.resumes || [],
+      linkedin: linkedin || '',
+      github: github || '',
+      website: website || '',
+      address: address || '',
+      city: city || '',
+      state: state || '',
+      country: country || '',
+      pincode: pincode || '',
+      college: college || '',
+      degree: degree || '',
+      branch: branch || '',
+      graduation_year: graduation_year || '',
+      cgpa: cgpa || '',
+      date_of_birth: date_of_birth || '',
+      gender: gender || '',
+      nationality: nationality || '',
+      current_company: current_company || '',
+      job_title: job_title || '',
+      years_of_experience: years_of_experience || '',
+      skills: skills || [],
+      languages: languages || [],
     };
 
     res.json(userData);
