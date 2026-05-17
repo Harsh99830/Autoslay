@@ -33,8 +33,9 @@ export default function Dashboard() {
 
   // Identity
   const [name, setName] = useState(user?.name || "");
-  const [emails, setEmails] = useState(user?.emails || []);
-  const [phones, setPhones] = useState(user?.phone_numbers || []);
+  const toArr = (v) => (Array.isArray(v) ? v : []);
+  const [emails, setEmails] = useState(toArr(user?.emails));
+  const [phones, setPhones] = useState(toArr(user?.phone_numbers));
   
   // Online presence
   const [linkedin, setLinkedin] = useState(user?.linkedin || "");
@@ -64,8 +65,8 @@ export default function Dashboard() {
   const [currentCompany, setCurrentCompany] = useState(user?.current_company || "");
   const [jobTitle, setJobTitle] = useState(user?.job_title || "");
   const [experience, setExperience] = useState(user?.years_of_experience || "");
-  const [skills, setSkills] = useState(user?.skills || []);
-  const [languages, setLanguages] = useState(user?.languages || []);
+  const [skills, setSkills] = useState(toArr(user?.skills));
+  const [languages, setLanguages] = useState(toArr(user?.languages));
 
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState(null);

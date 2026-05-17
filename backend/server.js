@@ -95,13 +95,30 @@ app.get('/user', authMiddleware, async (req, res) => {
     // Decrypt all profile fields before sending to client
     const p = decryptObject(profile || {}, ['id', 'created_at', 'updated_at']);
 
+    // Helper: ensure a field is always a proper JS array.
+    // Guards against Postgres array literals (e.g. "{a,b}") that slip through
+    // when a row was written before encryption was introduced.
+    const toArray = (val, fallback = []) => {
+      if (Array.isArray(val)) return val;
+      if (val === null || val === undefined || val === '') return fallback;
+      // Postgres array literal — strip braces and split
+      if (typeof val === 'string' && val.startsWith('{') && val.endsWith('}')) {
+        const inner = val.slice(1, -1).trim();
+        if (inner === '') return fallback;
+        return inner.split(',').map(s => s.replace(/^"|"$/g, '').trim());
+      }
+      return fallback;
+    };
+
     const userData = {
       id: req.user.id,
       email: req.user.email,
       name: p.name || req.user.user_metadata?.full_name || req.user.email?.split('@')[0] || '',
-      emails: p.emails || [req.user.email],
-      phone_numbers: p.phone_numbers || [],
-      resumes: p.resumes || [],
+      emails: toArray(p.emails, [req.user.email]),
+      phone_numbers: toArray(p.phone_numbers),
+      resumes: toArray(p.resumes),
+      // Legacy fallback: if emails ended up empty, seed with auth email
+      ...(!toArray(p.emails).length ? { emails: [req.user.email] } : {}),
       linkedin: p.linkedin || '',
       github: p.github || '',
       website: p.website || '',
@@ -125,8 +142,8 @@ app.get('/user', authMiddleware, async (req, res) => {
       current_company: p.current_company || '',
       job_title: p.job_title || '',
       years_of_experience: p.years_of_experience || '',
-      skills: p.skills || [],
-      languages: p.languages || [],
+      skills: toArray(p.skills),
+      languages: toArray(p.languages),
     };
 
     res.json(userData);
