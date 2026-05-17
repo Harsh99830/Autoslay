@@ -10,20 +10,15 @@
     }
 
     if (event.data?.type === 'AUTOSLAY_SAVE_USER') {
-      // Forward to extension background script
       chrome.runtime.sendMessage({
         type: 'SAVE_USER_DATA',
         user: event.data.user,
         token: event.data.token
-      }, (response) => {
-        console.log('Extension saved user data:', response);
-      });
+      }, () => {});
     }
 
     if (event.data?.type === 'AUTOSLAY_LOGOUT') {
-      chrome.runtime.sendMessage({ type: 'LOGOUT' }, (response) => {
-        console.log('Extension logged out:', response);
-      });
+      chrome.runtime.sendMessage({ type: 'LOGOUT' }, () => {});
     }
   });
 

@@ -149,8 +149,6 @@ app.post('/user/update', authMiddleware, async (req, res) => {
   } = req.body;
   const userId = req.user.id;
 
-  console.log('Update request body:', req.body);
-
   try {
     // Use service role client - it bypasses RLS
     // But we need to handle the case where profile doesn't exist yet
@@ -159,8 +157,6 @@ app.post('/user/update', authMiddleware, async (req, res) => {
       .select('id')
       .eq('id', userId)
       .single();
-
-    console.log('Existing profile:', existingProfile);
 
     let result;
     
@@ -222,13 +218,10 @@ app.post('/user/update', authMiddleware, async (req, res) => {
     });
     
     if (error) {
-      console.log('RPC error:', error);
       throw error;
     }
     
     result = { data, error: null };
-
-    console.log('Supabase result:', result);
 
     if (result.error) throw result.error;
 
@@ -265,10 +258,7 @@ app.post('/user/update', authMiddleware, async (req, res) => {
 
     res.json(userData);
   } catch (err) {
-    console.error('Error updating user:', err);
-    console.error('Error details:', err.message, err.stack);
-    if (err.code) console.error('Error code:', err.code);
-    if (err.details) console.error('Error details:', err.details);
+    console.error('Error updating user:', err.message);
     res.status(500).json({ error: 'Failed to update profile', details: err.message });
   }
 });

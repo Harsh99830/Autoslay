@@ -9,7 +9,6 @@ export default function AuthCallback() {
   useEffect(() => {
     // Wait for Supabase to process the OAuth callback
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log("Auth event:", event, "Session:", session);
       
       if (event === "SIGNED_IN" && session) {
         navigate("/dashboard");
