@@ -67,7 +67,7 @@ export default function Contact() {
                   fontWeight: '500',
                   fontFamily: 'Space Mono, monospace'
                 }}>
-                  support@autoslay.com
+                  solvers.real@gmail.com
                 </div>
               </div>
 
