@@ -1,7 +1,14 @@
 import { createCipheriv, createDecipheriv, randomBytes } from 'crypto';
 
 const ALGORITHM = 'aes-256-gcm';
-const KEY = Buffer.from(process.env.ENCRYPTION_KEY, 'hex'); // 32-byte key as 64-char hex string
+
+// Lazy-load the key so dotenv has time to run before this is read
+function getKey() {
+  if (!process.env.ENCRYPTION_KEY) {
+    throw new Error('ENCRYPTION_KEY env variable is not set');
+  }
+  return Buffer.from(process.env.ENCRYPTION_KEY, 'hex');
+}
 
 /**
  * Encrypt a value (string, array, or object).
@@ -13,8 +20,8 @@ export function encrypt(value) {
 
   const str = typeof value === 'string' ? value : JSON.stringify(value);
 
-  const iv = randomBytes(12); // 96-bit IV — recommended for AES-GCM
-  const cipher = createCipheriv(ALGORITHM, KEY, iv);
+  const iv = randomBytes(12);
+  const cipher = createCipheriv(ALGORITHM, getKey(), iv);
 
   const encrypted = Buffer.concat([cipher.update(str, 'utf8'), cipher.final()]);
   const authTag = cipher.getAuthTag();
@@ -42,7 +49,7 @@ export function decrypt(value) {
     const authTag = Buffer.from(authTagHex, 'hex');
     const encrypted = Buffer.from(encryptedHex, 'hex');
 
-    const decipher = createDecipheriv(ALGORITHM, KEY, iv);
+    const decipher = createDecipheriv(ALGORITHM, getKey(), iv);
     decipher.setAuthTag(authTag);
 
     const decrypted = Buffer.concat([decipher.update(encrypted), decipher.final()]).toString('utf8');

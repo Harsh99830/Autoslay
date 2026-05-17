@@ -57,6 +57,13 @@ ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS years_of_experience TEXT;
 ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS skills TEXT[] DEFAULT '{}';
 ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS languages TEXT[] DEFAULT '{}';
 
+-- !! ENCRYPTION MIGRATION !!
+-- Arrays are now stored as encrypted TEXT. Alter the column types:
+ALTER TABLE public.profiles ALTER COLUMN emails TYPE TEXT USING emails::TEXT;
+ALTER TABLE public.profiles ALTER COLUMN phone_numbers TYPE TEXT USING phone_numbers::TEXT;
+ALTER TABLE public.profiles ALTER COLUMN skills TYPE TEXT USING skills::TEXT;
+ALTER TABLE public.profiles ALTER COLUMN languages TYPE TEXT USING languages::TEXT;
+
 -- Enable RLS
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 
@@ -102,11 +109,12 @@ CREATE TRIGGER on_auth_user_created
     EXECUTE FUNCTION public.handle_new_user();
 
 -- Function to upsert profile (bypasses RLS via SECURITY DEFINER)
+-- NOTE: emails, phone_numbers, skills, languages are now TEXT (encrypted)
 CREATE OR REPLACE FUNCTION public.upsert_profile_admin(
     p_user_id UUID,
     p_name TEXT,
-    p_emails TEXT[],
-    p_phone_numbers TEXT[],
+    p_emails TEXT,
+    p_phone_numbers TEXT,
     p_linkedin TEXT,
     p_github TEXT,
     p_website TEXT,
@@ -126,8 +134,8 @@ CREATE OR REPLACE FUNCTION public.upsert_profile_admin(
     p_current_company TEXT,
     p_job_title TEXT,
     p_years_of_experience TEXT,
-    p_skills TEXT[],
-    p_languages TEXT[]
+    p_skills TEXT,
+    p_languages TEXT
 )
 RETURNS public.profiles AS $$
 DECLARE

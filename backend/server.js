@@ -342,3 +342,10 @@ app.post('/auth/callback', async (req, res) => {
 
 // Export for Vercel
 export default app;
+
+// Listen locally (Vercel ignores this)
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, () => {
+    console.log(`🚀 Server running on http://localhost:${PORT}`);
+  });
+}
