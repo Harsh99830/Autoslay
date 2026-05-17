@@ -120,6 +120,17 @@ export default function Dashboard() {
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
+          <a
+            href="https://chromewebstore.google.com/detail/autoslay-%E2%80%93-fill-any-form/lafjiaflpnifhglhjcolidljogmbigco"
+            target="_blank"
+            rel="noreferrer"
+            className="dash-ext-btn"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M20.5 11H19V7a2 2 0 0 0-2-2h-4V3.5A2.5 2.5 0 0 0 10.5 1 2.5 2.5 0 0 0 8 3.5V5H4a2 2 0 0 0-2 2v3.8h1.5A2.7 2.7 0 0 1 6.2 13.5 2.7 2.7 0 0 1 3.5 16.2H2V20a2 2 0 0 0 2 2h3.8v-1.5A2.7 2.7 0 0 1 10.5 17.8a2.7 2.7 0 0 1 2.7 2.7V22H17a2 2 0 0 0 2-2v-4h1.5a2.5 2.5 0 0 0 2.5-2.5 2.5 2.5 0 0 0-2.5-2.5z"/>
+            </svg>
+            Go to Extension
+          </a>
           <button className="dash-topbar-logout" onClick={logout} title="Sign out">
             <Icon type="logout" size={18} />
           </button>
