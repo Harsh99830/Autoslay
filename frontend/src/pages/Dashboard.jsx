@@ -1,11 +1,10 @@
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import Navbar from "../components/Navbar";
 import TagInput from "../components/TagInput";
 import Toast from "../components/Toast";
 import "../styles/dashboard.css";
 
-// ── Icon Components ──────────────────────────────────────────────────────
 const Icon = ({ type, size = 16 }) => {
   const s = { width: size, height: size };
   const icons = {
@@ -31,37 +30,32 @@ const Icon = ({ type, size = 16 }) => {
 export default function Dashboard() {
   const { user, updateUser, logout } = useAuth();
 
-  // Identity
-  const [name, setName] = useState(user?.name || "");
   const toArr = (v) => (Array.isArray(v) ? v : []);
+
+  const [name, setName] = useState(user?.name || "");
   const [emails, setEmails] = useState(toArr(user?.emails));
   const [phones, setPhones] = useState(toArr(user?.phone_numbers));
-  
-  // Online presence
+
   const [linkedin, setLinkedin] = useState(user?.linkedin || "");
   const [github, setGithub] = useState(user?.github || "");
   const [website, setWebsite] = useState(user?.website || "");
 
-  // Address
   const [address, setAddress] = useState(user?.address || "");
   const [city, setCity] = useState(user?.city || "");
   const [state, setState] = useState(user?.state || "");
   const [country, setCountry] = useState(user?.country || "");
   const [pincode, setPincode] = useState(user?.pincode || "");
 
-  // Education
   const [college, setCollege] = useState(user?.college || "");
   const [degree, setDegree] = useState(user?.degree || "");
   const [branch, setBranch] = useState(user?.branch || "");
   const [graduationYear, setGraduationYear] = useState(user?.graduation_year || "");
   const [cgpa, setCgpa] = useState(user?.cgpa || "");
 
-  // Personal
   const [dob, setDob] = useState(user?.date_of_birth || "");
   const [gender, setGender] = useState(user?.gender || "");
   const [nationality, setNationality] = useState(user?.nationality || "");
 
-  // Professional
   const [currentCompany, setCurrentCompany] = useState(user?.current_company || "");
   const [jobTitle, setJobTitle] = useState(user?.job_title || "");
   const [experience, setExperience] = useState(user?.years_of_experience || "");
@@ -98,7 +92,6 @@ export default function Dashboard() {
     }
   };
 
-  
   const matchesSearch = (text) => {
     if (!searchQuery) return true;
     return text.toLowerCase().includes(searchQuery.toLowerCase());
@@ -109,7 +102,7 @@ export default function Dashboard() {
       <Navbar onLogout={logout} user={user} />
 
       <div className="dash-main">
-        {/* ── Top bar with search ── */}
+
         <div className="dash-topbar">
           <div className="dash-search-wrap">
             <span className="dash-search-icon"><Icon type="search" size={15} /></span>
@@ -137,10 +130,8 @@ export default function Dashboard() {
           </button>
         </div>
 
-        {/* ── Content ── */}
         <div className="dash-content">
 
-          {/* ── Hero ── */}
           <div className="dash-hero">
             <div className="dash-hero__badge">
               <span className="badge-dot" />
@@ -157,10 +148,8 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* ── Grid ── */}
           <div className="dash-grid">
 
-            {/* Legal Identity */}
             {matchesSearch("name legal identity") && (
               <div className="dash-section">
                 <div className="dash-section__header">
@@ -183,7 +172,6 @@ export default function Dashboard() {
               </div>
             )}
 
-            {/* Chronology / DOB */}
             {matchesSearch("date of birth dob chronology") && (
               <div className="dash-section">
                 <div className="dash-section__header">
@@ -206,7 +194,6 @@ export default function Dashboard() {
               </div>
             )}
 
-            {/* Communications / Email */}
             {matchesSearch("email communications") && (
               <div className="dash-section">
                 <div className="dash-section__header">
@@ -227,7 +214,7 @@ export default function Dashboard() {
                     />
                     {index === 0 && email && <span className="field-card__badge">PRIMARY</span>}
                     {emails.length > 1 && (
-                      <button 
+                      <button
                         className="field-delete-btn"
                         onClick={() => setEmails(emails.filter((_, i) => i !== index))}
                       >
@@ -242,7 +229,6 @@ export default function Dashboard() {
               </div>
             )}
 
-            {/* Verification / Phone */}
             {matchesSearch("phone verification") && (
               <div className="dash-section">
                 <div className="dash-section__header">
@@ -262,7 +248,7 @@ export default function Dashboard() {
                       placeholder="+91 00000 00000"
                     />
                     {phones.length > 1 && (
-                      <button 
+                      <button
                         className="field-delete-btn"
                         onClick={() => setPhones(phones.filter((_, i) => i !== index))}
                       >
@@ -277,7 +263,6 @@ export default function Dashboard() {
               </div>
             )}
 
-            {/* Personal Info / Gender */}
             {matchesSearch("gender personal info") && (
               <div className="dash-section">
                 <div className="dash-section__header">
@@ -301,7 +286,6 @@ export default function Dashboard() {
               </div>
             )}
 
-            {/* Citizenship / Nationality */}
             {matchesSearch("nationality citizenship") && (
               <div className="dash-section">
                 <div className="dash-section__header">
@@ -324,7 +308,6 @@ export default function Dashboard() {
               </div>
             )}
 
-            {/* Address */}
             {matchesSearch("address street city state country pincode zip") && (
               <div className="dash-section" style={{ gridColumn: "1 / -1" }}>
                 <div className="dash-section__header">
@@ -364,7 +347,6 @@ export default function Dashboard() {
               </div>
             )}
 
-            {/* Education */}
             {matchesSearch("college university degree branch graduation cgpa education") && (
               <div className="dash-section" style={{ gridColumn: "1 / -1" }}>
                 <div className="dash-section__header">
@@ -392,7 +374,6 @@ export default function Dashboard() {
               </div>
             )}
 
-            {/* Professional */}
             {matchesSearch("company job title experience skills professional") && (
               <div className="dash-section" style={{ gridColumn: "1 / -1" }}>
                 <div className="dash-section__header">
@@ -430,7 +411,6 @@ export default function Dashboard() {
               </div>
             )}
 
-            {/* Online Presence */}
             {matchesSearch("linkedin github website portfolio online") && (
               <div className="dash-section" style={{ gridColumn: "1 / -1" }}>
                 <div className="dash-section__header">
@@ -456,12 +436,17 @@ export default function Dashboard() {
               </div>
             )}
 
-            
           </div>
+
+          <div style={{ display: "flex", justifyContent: "flex-end", padding: "32px 0" }}>
+            <button className="save-btn" onClick={saveProfile} disabled={saving}>
+              {saving ? <span className="spinner" /> : "SAVE CHANGES"}
+            </button>
+          </div>
+
         </div>
       </div>
 
-      {/* ── Footer ── */}
       <div className="dash-footer">
         <div className="dash-footer__left">
           <span className="dash-footer__dot" />
