@@ -17,6 +17,8 @@ app.use(cors({
   origin: [
     'http://localhost:5173',
     'https://autoslay.vercel.app',
+    'https://autoslay.online',
+    'https://www.autoslay.online',
     process.env.FRONTEND_URL,
   ].filter(Boolean),
   credentials: true,

@@ -452,7 +452,7 @@ export default function Dashboard() {
           <span className="dash-footer__dot" />
           END-TO-END ENCRYPTED IDENTITY VAULT
         </div>
-        <div className="dash-footer__right">AUTOSLAY ENGINE V1.0.1</div>
+        <div className="dash-footer__right">AUTOSLAY ENGINE V1.0.2</div>
       </div>
 
       {toast && <Toast message={toast.msg} type={toast.type} />}

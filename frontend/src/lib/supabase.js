@@ -16,4 +16,4 @@ export const API_BASE =
     ? explicitApiUrl
     : isLocalhost
     ? 'http://localhost:4000'
-    : 'https://autoslay-backend.vercel.app';
+    : 'https://api.autoslay.online';

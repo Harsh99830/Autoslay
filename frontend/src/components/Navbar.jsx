@@ -38,6 +38,7 @@ const NavIcon = ({ type }) => {
 
 export default function Navbar({ onLogout }) {
   const { user } = useAuth();
+  const currentPath = window.location.pathname;
 
   const initials = (user?.name || "?")
     .split(" ")
@@ -51,7 +52,7 @@ export default function Navbar({ onLogout }) {
       <div className="navbar__logo">AUTOSLAY</div>
       
       <div className="navbar__nav">
-        <a href="/dashboard" className="navbar__nav-item active">
+        <a href="/dashboard" className={`navbar__nav-item${currentPath === '/dashboard' ? ' active' : ''}`}>
           <span className="navbar__nav-icon"><NavIcon type="identity" /></span>
           Dashboard
         </a>
@@ -59,7 +60,7 @@ export default function Navbar({ onLogout }) {
           <span className="navbar__nav-icon"><NavIcon type="settings" /></span>
           Settings
         </button>
-        <a href="/contact" className="navbar__nav-item">
+        <a href="/contact" className={`navbar__nav-item${currentPath === '/contact' ? ' active' : ''}`}>
           <span className="navbar__nav-icon"><NavIcon type="help" /></span>
           Contact
         </a>
