@@ -282,6 +282,52 @@ app.post('/user/update', authMiddleware, async (req, res) => {
   }
 });
 
+// Delete user profile data — nulls every profile field but keeps the auth.users account intact.
+// The user can log back in and re-fill their data at any time.
+app.delete('/user/data', authMiddleware, async (req, res) => {
+  const userId = req.user.id;
+  try {
+    const { error } = await supabase
+      .from('profiles')
+      .update({
+        name: null,
+        emails: null,
+        phone_numbers: null,
+        resumes: null,
+        linkedin: null,
+        github: null,
+        website: null,
+        address: null,
+        city: null,
+        state: null,
+        country: null,
+        pincode: null,
+        college: null,
+        degree: null,
+        branch: null,
+        graduation_year: null,
+        cgpa: null,
+        date_of_birth: null,
+        gender: null,
+        nationality: null,
+        current_company: null,
+        job_title: null,
+        years_of_experience: null,
+        skills: null,
+        languages: null,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', userId);
+
+    if (error) throw error;
+
+    res.json({ success: true, message: 'Profile data deleted. Your account remains active.' });
+  } catch (err) {
+    console.error('Error deleting user data:', err.message);
+    res.status(500).json({ error: 'Failed to delete profile data', details: err.message });
+  }
+});
+
 // Upload resume
 app.post('/upload-resume', authMiddleware, upload.single('resume'), async (req, res) => {
   if (!req.file) {

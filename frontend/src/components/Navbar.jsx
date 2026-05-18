@@ -56,10 +56,10 @@ export default function Navbar({ onLogout }) {
           <span className="navbar__nav-icon"><NavIcon type="identity" /></span>
           Dashboard
         </a>
-        <button className="navbar__nav-item">
+        <a href="/settings" className={`navbar__nav-item${currentPath === '/settings' ? ' active' : ''}`}>
           <span className="navbar__nav-icon"><NavIcon type="settings" /></span>
           Settings
-        </button>
+        </a>
         <a href="/contact" className={`navbar__nav-item${currentPath === '/contact' ? ' active' : ''}`}>
           <span className="navbar__nav-icon"><NavIcon type="help" /></span>
           Contact
@@ -76,7 +76,6 @@ export default function Navbar({ onLogout }) {
                 const email = user?.emails?.[0] || user?.email || "No email";
                 if (email === "No email") return email;
                 if (email.length <= 20) return email;
-                // Show first 20 chars + ... at end
                 return `${email.slice(0, 20)}...`;
               })()}
             </div>

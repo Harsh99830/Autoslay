@@ -150,6 +150,25 @@ export function AuthProvider({ children }) {
     return result;
   }
 
+  // Clears all profile data from the `profiles` table.
+  // Does NOT delete the auth.users account — the user can still log in.
+  async function deleteUserData() {
+    if (!session?.access_token) throw new Error("Not authenticated");
+
+    const res = await fetch(`${API_BASE}/user/data`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${session.access_token}` },
+    });
+
+    if (!res.ok) {
+      const errBody = await res.json().catch(() => ({}));
+      throw new Error(errBody.error || "Delete failed");
+    }
+
+    // Refresh user state so UI reflects the cleared data
+    await fetchUser(session.access_token);
+  }
+
   async function logout() {
     await supabase.auth.signOut();
     setUser(null);
@@ -171,6 +190,7 @@ export function AuthProvider({ children }) {
         logout,
         updateUser,
         uploadResume,
+        deleteUserData,
         signInWithGoogle,
       }}
     >
