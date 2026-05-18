@@ -65,7 +65,7 @@
   padding: 9px 16px;
   border-radius: 50px;
   background: var(--cyan-dim);
-  border: 1px solid rgba(0, 229, 199, 0.35);
+  border: none;
   color: var(--cyan);
   font-size: 12px;
   font-weight: 700;
@@ -74,12 +74,44 @@
   text-decoration: none;
   white-space: nowrap;
   flex-shrink: 0;
-  transition: background 0.15s, box-shadow 0.15s;
+  transition: background 0.15s;
+  position: relative;
+  z-index: 0;
+  isolation: isolate;
 }
 
-.dash-ext-btn:hover {
-  background: rgba(0, 229, 199, 0.15);
-  box-shadow: 0 0 10px rgba(0, 229, 199, 0.2);
+/* Spinning rainbow ring */
+.dash-ext-btn::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: 50px;
+  z-index: -1;
+  background: linear-gradient(90deg,
+    #ff0080, #ff8c00, #ffe600, #00e5c7, #00aaff, #a855f7, #ff0080
+  );
+  background-size: 300% 100%;
+  animation: border-run 2s linear infinite;
+}
+
+/* Inner fill to punch out the center, leaving only the border ring */
+.dash-ext-btn::after {
+  content: '';
+  position: absolute;
+  inset: 1px;
+  border-radius: 50px;
+  background: var(--bg);
+  z-index: -1;
+  transition: background 0.15s;
+}
+
+@keyframes border-run {
+  0%   { background-position: 0% 0%; }
+  100% { background-position: 300% 0%; }
+}
+
+.dash-ext-btn:hover::after {
+  background: rgba(0, 229, 199, 0.12);
 }
 
 .dash-search-wrap {
