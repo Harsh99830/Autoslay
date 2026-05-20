@@ -6,7 +6,7 @@ chrome.runtime.onInstalled.addListener((details) => {
   // Open website automatically after fresh install
   if (details.reason === "install") {
     chrome.tabs.create({
-      url: "https://autoslay.vercel.app"
+      url: "https://autoslay.online"
     });
   }
 });

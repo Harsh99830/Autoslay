@@ -20,7 +20,7 @@
       "run_at": "document_idle"
     },
     {
-      "matches": ["https://autoslay.vercel.app/*"],
+      "matches": ["https://autoslay.online/*"],
       "js": ["config.js", "bridge.js"],
       "run_at": "document_start"
     }
